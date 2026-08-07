@@ -1,4 +1,4 @@
-import type { Metadata } from 'next';
+import type { Metadata, Viewport } from 'next';
 import { Inter } from 'next/font/google';
 import './globals.css';
 
@@ -8,10 +8,12 @@ export const metadata: Metadata = {
   title: 'Community Redressal Planner — AI Civic Operating System',
   description: 'AI-powered municipal complaint management, SLA escalation tracking, and GIS mapping platform.',
   manifest: '/manifest.json',
-  themeColor: '#0284c7',
   icons: { icon: '/favicon.ico' },
 };
 
+export const viewport: Viewport = {
+  themeColor: '#4b41e1',
+};
 
 export default function RootLayout({
   children,
@@ -20,7 +22,7 @@ export default function RootLayout({
 }) {
   return (
     <html lang="en" className={`dark ${inter.variable}`}>
-      <body className="min-h-screen bg-slate-950 text-slate-100 antialiased font-sans">
+      <body className="min-h-screen bg-[#101415] text-slate-100 antialiased font-sans">
         {children}
       </body>
     </html>
