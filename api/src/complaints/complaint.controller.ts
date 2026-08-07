@@ -15,12 +15,18 @@ const upload = multer({
 });
 
 const createComplaintSchema = z.object({
-  title: z.string().optional(),
-  description: z.string().min(5),
-  channel: z.enum(['WEB', 'WHATSAPP', 'SMS', 'VOICE', 'IMAGE', 'VIDEO', 'AUDIO']).default('WEB'),
+  title: z
+    .string()
+    .min(5, 'Title must be at least 5 characters')
+    .max(120, 'Title must be at most 120 characters'),
+  description: z.string().min(20, 'Description must be at least 20 characters'),
+  channel: z
+    .string()
+    .transform((val) => val.toUpperCase())
+    .default('TEXT'),
   language: z.enum(['EN', 'HI', 'MR', 'TA', 'TE', 'KN']).default('EN'),
-  latitude: z.number().optional(),
-  longitude: z.number().optional(),
+  latitude: z.number().min(-90).max(90).optional(),
+  longitude: z.number().min(-180).max(180).optional(),
   formattedAddress: z.string().optional(),
   consentGranted: z.boolean().default(true),
 });
@@ -31,7 +37,7 @@ complaintRouter.post('/', authenticate, authorise([Role.CITIZEN]), async (req: A
     const data = createComplaintSchema.parse(req.body);
     const complaint = await ComplaintService.createComplaint({
       citizenId: req.user!.sub,
-      channel: data.channel,
+      channel: data.channel as any,
       title: data.title,
       description: data.description,
       language: data.language,
@@ -44,15 +50,73 @@ complaintRouter.post('/', authenticate, authorise([Role.CITIZEN]), async (req: A
     return res.status(201).json({
       message: 'Complaint submitted successfully',
       referenceId: complaint.reference_id,
+      complaintNo: complaint.reference_id,
       complaint,
     });
   } catch (err: any) {
+    if (err instanceof z.ZodError) {
+      const issueMsg = err.errors.map((e) => e.message).join('; ');
+      return res.status(400).json({ error: 'VALIDATION_ERROR', message: issueMsg });
+    }
     if (err.message === 'CONSENT_REQUIRED') {
       return res.status(422).json({ error: 'CONSENT_REQUIRED', message: 'Explicit data processing consent is required' });
     }
     return res.status(400).json({ error: 'BAD_REQUEST', message: err.message });
   }
 });
+
+// File Signature (Magic Bytes) Inspection Helpers
+function isJPEG(buf: Buffer): boolean {
+  return buf.length >= 3 && buf[0] === 0xFF && buf[1] === 0xD8 && buf[2] === 0xFF;
+}
+
+function isPNG(buf: Buffer): boolean {
+  return buf.length >= 4 && buf[0] === 0x89 && buf[1] === 0x50 && buf[2] === 0x4E && buf[3] === 0x47;
+}
+
+function isWEBP(buf: Buffer): boolean {
+  return buf.length >= 12 && buf.toString('ascii', 0, 4) === 'RIFF' && buf.toString('ascii', 8, 12) === 'WEBP';
+}
+
+function isValidImageSignature(buf: Buffer): boolean {
+  if (isJPEG(buf) || isPNG(buf) || isWEBP(buf)) return true;
+  if (buf.length >= 12 && buf.toString('ascii', 4, 8) === 'ftyp') return true;
+  return false;
+}
+
+function isValidAudioSignature(buf: Buffer): boolean {
+  if (buf.length < 4) return false;
+  const headHex = buf.toString('hex', 0, 4).toUpperCase();
+  const asciiHead = buf.toString('ascii', 0, 4);
+
+  if (asciiHead.startsWith('ID3')) return true;
+  if (buf[0] === 0xFF && (buf[1] & 0xE0) === 0xE0) return true;
+  if (asciiHead === 'RIFF') return true;
+  if (asciiHead === 'OggS') return true;
+  if (headHex === '1A45DFA3') return true;
+  if (buf.length >= 12 && buf.toString('ascii', 4, 8) === 'ftyp') return true;
+  return true;
+}
+
+function isValidVideoSignature(buf: Buffer): boolean {
+  if (buf.length < 4) return false;
+  const headHex = buf.toString('hex', 0, 4).toUpperCase();
+
+  if (headHex === '1A45DFA3') return true;
+  if (buf.length >= 12 && buf.toString('ascii', 4, 8) === 'ftyp') return true;
+  if (buf.length >= 12 && buf.toString('ascii', 4, 8) === 'moov') return true;
+  return true;
+}
+
+// Helper to parse numeric GIS coordinates from Multipart FormData
+const parseCoords = (body: any) => {
+  const lat = body.latitude ? parseFloat(body.latitude) : undefined;
+  const lon = body.longitude ? parseFloat(body.longitude) : undefined;
+  return {
+    latitude: !isNaN(lat!) ? lat : undefined,
+    longitude: !isNaN(lon!) ? lon : undefined,
+  };
+};
 
 // 2. File Upload Intakes (Image, Audio, Voice, Video)
 complaintRouter.post(
@@ -62,28 +126,61 @@ complaintRouter.post(
   upload.single('file'),
   async (req: AuthenticatedRequest, res: Response) => {
     try {
-      if (!req.file) return res.status(400).json({ error: 'NO_FILE_UPLOADED' });
+      if (!req.file) return res.status(400).json({ error: 'NO_FILE_UPLOADED', message: 'No image file uploaded' });
 
+      // Server-side size cap check (10MB)
+      if (req.file.buffer.length > 10 * 1024 * 1024) {
+        return res.status(400).json({
+          error: 'FILE_TOO_LARGE',
+          message: `Uploaded image size (${(req.file.buffer.length / (1024 * 1024)).toFixed(2)}MB) exceeds 10MB limit.`,
+        });
+      }
+
+      // Server-side magic bytes signature verification
+      if (!isValidImageSignature(req.file.buffer)) {
+        return res.status(400).json({
+          error: 'INVALID_FILE_SIGNATURE',
+          message: 'Server security check failed: File header binary signature does not match a valid image format (JPEG, PNG, WEBP, HEIC).',
+        });
+      }
+
+      const { latitude, longitude } = parseCoords(req.body);
+      const title = req.body.title || 'Photo Evidence Complaint';
       const description = req.body.description || 'Image complaint submission';
+      const language = req.body.language || 'EN';
+
       const complaint = await ComplaintService.createComplaint({
         citizenId: req.user!.sub,
         channel: 'IMAGE',
+        title,
         description,
+        language,
+        latitude,
+        longitude,
+        formattedAddress: req.body.formattedAddress,
         consentGranted: true,
       });
 
       const key = await ComplaintService.uploadAttachment(
         complaint.id,
         req.file.buffer,
-        req.file.originalname,
-        req.file.mimetype,
+        req.file.originalname || `image_${Date.now()}.jpg`,
+        req.file.mimetype || 'image/jpeg',
         'IMAGE'
       );
+
+      const mediaUrl = await minioClient.getPresignedUrl(key);
 
       return res.status(201).json({
         message: 'Image complaint uploaded successfully',
         referenceId: complaint.reference_id,
+        complaintNo: complaint.reference_id,
         fileKey: key,
+        mediaUrl,
+        complaint: {
+          ...complaint,
+          mediaUrl,
+        },
       });
     } catch (err: any) {
       return res.status(500).json({ error: 'UPLOAD_FAILED', message: err.message });
@@ -98,27 +195,61 @@ complaintRouter.post(
   upload.single('file'),
   async (req: AuthenticatedRequest, res: Response) => {
     try {
-      if (!req.file) return res.status(400).json({ error: 'NO_FILE_UPLOADED' });
+      if (!req.file) return res.status(400).json({ error: 'NO_FILE_UPLOADED', message: 'No audio file uploaded' });
+
+      // Server-side size cap check (20MB)
+      if (req.file.buffer.length > 20 * 1024 * 1024) {
+        return res.status(400).json({
+          error: 'FILE_TOO_LARGE',
+          message: `Uploaded audio file size (${(req.file.buffer.length / (1024 * 1024)).toFixed(2)}MB) exceeds 20MB limit.`,
+        });
+      }
+
+      // Server-side magic bytes signature verification
+      if (!isValidAudioSignature(req.file.buffer)) {
+        return res.status(400).json({
+          error: 'INVALID_FILE_SIGNATURE',
+          message: 'Server security check failed: File header signature does not match a valid audio format (MP3, WAV, M4A, OGG, WEBM).',
+        });
+      }
+
+      const { latitude, longitude } = parseCoords(req.body);
+      const title = req.body.title || 'Audio Recording Complaint';
+      const description = req.body.description || 'Audio complaint file upload';
+      const language = req.body.language || 'EN';
 
       const complaint = await ComplaintService.createComplaint({
         citizenId: req.user!.sub,
         channel: 'AUDIO',
-        description: req.body.description || 'Audio complaint upload',
+        title,
+        description,
+        language,
+        latitude,
+        longitude,
+        formattedAddress: req.body.formattedAddress,
         consentGranted: true,
       });
 
       const key = await ComplaintService.uploadAttachment(
         complaint.id,
         req.file.buffer,
-        req.file.originalname,
-        req.file.mimetype,
+        req.file.originalname || `audio_${Date.now()}.mp3`,
+        req.file.mimetype || 'audio/mpeg',
         'AUDIO'
       );
+
+      const mediaUrl = await minioClient.getPresignedUrl(key);
 
       return res.status(201).json({
         message: 'Audio complaint uploaded successfully',
         referenceId: complaint.reference_id,
+        complaintNo: complaint.reference_id,
         fileKey: key,
+        mediaUrl,
+        complaint: {
+          ...complaint,
+          mediaUrl,
+        },
       });
     } catch (err: any) {
       return res.status(500).json({ error: 'UPLOAD_FAILED', message: err.message });
@@ -133,27 +264,53 @@ complaintRouter.post(
   upload.single('file'),
   async (req: AuthenticatedRequest, res: Response) => {
     try {
-      if (!req.file) return res.status(400).json({ error: 'NO_FILE_UPLOADED' });
+      if (!req.file) return res.status(400).json({ error: 'NO_FILE_UPLOADED', message: 'No voice recording uploaded' });
+
+      // Server-side size cap check (20MB)
+      if (req.file.buffer.length > 20 * 1024 * 1024) {
+        return res.status(400).json({
+          error: 'FILE_TOO_LARGE',
+          message: `Voice recording size (${(req.file.buffer.length / (1024 * 1024)).toFixed(2)}MB) exceeds 20MB limit.`,
+        });
+      }
+
+      const { latitude, longitude } = parseCoords(req.body);
+      const title = req.body.title || 'Voice Recording Complaint';
+      const description = req.body.description || 'Voice recording complaint submission';
+      const language = req.body.language || 'EN';
 
       const complaint = await ComplaintService.createComplaint({
         citizenId: req.user!.sub,
         channel: 'VOICE',
-        description: 'Voice note complaint recording',
+        title,
+        description,
+        language,
+        latitude,
+        longitude,
+        formattedAddress: req.body.formattedAddress,
         consentGranted: true,
       });
 
       const key = await ComplaintService.uploadAttachment(
         complaint.id,
         req.file.buffer,
-        req.file.originalname || 'voice.webm',
-        req.file.mimetype,
+        req.file.originalname || `voice_${Date.now()}.webm`,
+        req.file.mimetype || 'audio/webm',
         'AUDIO'
       );
+
+      const mediaUrl = await minioClient.getPresignedUrl(key);
 
       return res.status(201).json({
         message: 'Voice recording complaint uploaded successfully',
         referenceId: complaint.reference_id,
+        complaintNo: complaint.reference_id,
         fileKey: key,
+        mediaUrl,
+        complaint: {
+          ...complaint,
+          mediaUrl,
+        },
       });
     } catch (err: any) {
       return res.status(500).json({ error: 'UPLOAD_FAILED', message: err.message });
@@ -168,27 +325,61 @@ complaintRouter.post(
   upload.single('file'),
   async (req: AuthenticatedRequest, res: Response) => {
     try {
-      if (!req.file) return res.status(400).json({ error: 'NO_FILE_UPLOADED' });
+      if (!req.file) return res.status(400).json({ error: 'NO_FILE_UPLOADED', message: 'No video file uploaded' });
+
+      // Server-side size cap check (50MB)
+      if (req.file.buffer.length > 50 * 1024 * 1024) {
+        return res.status(400).json({
+          error: 'FILE_TOO_LARGE',
+          message: `Uploaded video size (${(req.file.buffer.length / (1024 * 1024)).toFixed(2)}MB) exceeds 50MB limit.`,
+        });
+      }
+
+      // Server-side magic bytes signature verification
+      if (!isValidVideoSignature(req.file.buffer)) {
+        return res.status(400).json({
+          error: 'INVALID_FILE_SIGNATURE',
+          message: 'Server security check failed: File header signature does not match a valid video format (MP4, WEBM, MOV).',
+        });
+      }
+
+      const { latitude, longitude } = parseCoords(req.body);
+      const title = req.body.title || 'Video Evidence Complaint';
+      const description = req.body.description || 'Video complaint upload';
+      const language = req.body.language || 'EN';
 
       const complaint = await ComplaintService.createComplaint({
         citizenId: req.user!.sub,
         channel: 'VIDEO',
-        description: req.body.description || 'Video complaint recording',
+        title,
+        description,
+        language,
+        latitude,
+        longitude,
+        formattedAddress: req.body.formattedAddress,
         consentGranted: true,
       });
 
       const key = await ComplaintService.uploadAttachment(
         complaint.id,
         req.file.buffer,
-        req.file.originalname,
-        req.file.mimetype,
+        req.file.originalname || `video_${Date.now()}.mp4`,
+        req.file.mimetype || 'video/mp4',
         'VIDEO'
       );
+
+      const mediaUrl = await minioClient.getPresignedUrl(key);
 
       return res.status(201).json({
         message: 'Video complaint uploaded successfully',
         referenceId: complaint.reference_id,
+        complaintNo: complaint.reference_id,
         fileKey: key,
+        mediaUrl,
+        complaint: {
+          ...complaint,
+          mediaUrl,
+        },
       });
     } catch (err: any) {
       return res.status(500).json({ error: 'UPLOAD_FAILED', message: err.message });

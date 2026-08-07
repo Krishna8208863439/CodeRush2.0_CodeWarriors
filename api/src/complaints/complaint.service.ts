@@ -56,21 +56,72 @@ export class ComplaintService {
     );
     const complaint = complaintRes.rows[0];
 
-    // 4. Save GIS Location if coordinates provided
+    // 4. Reverse Geocoding for Ward Resolution via OpenStreetMap Nominatim
+    let resolvedWard = 'unresolved';
+    let formattedAddr = dto.formattedAddress || '';
+
     if (dto.latitude !== undefined && dto.longitude !== undefined) {
+      try {
+        const geoRes = await axios.get('https://nominatim.openstreetmap.org/reverse', {
+          params: {
+            format: 'json',
+            lat: dto.latitude,
+            lon: dto.longitude,
+            zoom: 18,
+            addressdetails: 1,
+          },
+          headers: {
+            'User-Agent': 'SwachhLensAI-CivicPortal/1.0 (contact: admin@communityredressal.gov.in)',
+          },
+          timeout: 3500,
+        });
+
+        if (geoRes.data) {
+          const addr = geoRes.data.address || {};
+          resolvedWard =
+            addr.suburb ||
+            addr.neighbourhood ||
+            addr.residential ||
+            addr.city_district ||
+            addr.county ||
+            addr.city ||
+            'unresolved';
+
+          if (!formattedAddr) {
+            formattedAddr = geoRes.data.display_name || `Lat: ${dto.latitude}, Lon: ${dto.longitude}`;
+          }
+        }
+      } catch (geoErr: any) {
+        console.warn(`[Reverse Geocoding Failed for (${dto.latitude}, ${dto.longitude})]:`, geoErr.message);
+        resolvedWard = 'unresolved';
+        if (!formattedAddr) {
+          formattedAddr = `Lat: ${dto.latitude}, Lon: ${dto.longitude}`;
+        }
+      }
+
       await query(
         `INSERT INTO gis_locations (complaint_id, geom, latitude, longitude, formatted_address)
          VALUES ($1, ST_SetSRID(ST_MakePoint($2, $3), 4326), $3, $2, $4)`,
-        [complaint.id, dto.longitude, dto.latitude, dto.formattedAddress || '']
+        [complaint.id, dto.longitude, dto.latitude, `[Ward: ${resolvedWard}] ${formattedAddr}`]
       );
     }
+
+    // Attach GIS & Ward data to returned complaint
+    const resultComplaint = {
+      ...complaint,
+      complaintNo: complaint.reference_id,
+      latitude: dto.latitude ?? null,
+      longitude: dto.longitude ?? null,
+      ward: resolvedWard,
+      formattedAddress: formattedAddr,
+    };
 
     // 5. Asynchronous AI Translation & Classification Pipeline Trigger
     this.triggerAIPipeline(complaint.id, dto.description, lang).catch((err) => {
       console.error('Async AI Pipeline Execution Error:', err.message);
     });
 
-    return complaint;
+    return resultComplaint;
   }
 
   // Phase 2: AI Pipeline Trigger

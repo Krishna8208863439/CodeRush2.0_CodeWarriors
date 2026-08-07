@@ -10,10 +10,7 @@ import {
   Mail,
   Lock,
   AlertCircle,
-  ArrowRight,
-  Sparkles,
-  ChevronDown,
-  KeyRound
+  ChevronDown
 } from 'lucide-react';
 import { api } from '@/lib/api';
 
@@ -29,28 +26,22 @@ function LoginContent() {
   const router = useRouter();
   const searchParams = useSearchParams();
 
-  // Tab State: 'citizen' or 'officer'
+  // Active Portal Tab: 'citizen' or 'officer'
   const [activeTab, setActiveTab] = useState<'citizen' | 'officer'>('citizen');
 
-  // Sub-login mode for citizen: 'password' or 'otp'
-  const [citizenLoginMode, setCitizenLoginMode] = useState<'password' | 'otp'>('password');
-
-  // Selected Department for Officer
+  // Selected Department for Officer Login
   const [selectedDeptCode, setSelectedDeptCode] = useState('WSS');
 
-  // Form inputs
+  // Form Inputs (Strict Email & Password Authentication)
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
 
   const [loading, setLoading] = useState(false);
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
-  const [simulatedNotice, setSimulatedNotice] = useState<string | null>(null);
 
-  // Pre-select tab based on ?tab= (preferred) or legacy ?role= param.
-  // ?tab=citizen  → Tab A   |   ?tab=officer → Tab B
-  // ?role=officer → Tab B   |   (default)    → Tab A
+  // Pre-select tab based on ?tab= or ?role= query param
   useEffect(() => {
-    const tab  = searchParams.get('tab');
+    const tab = searchParams.get('tab');
     const role = searchParams.get('role');
     if (tab === 'officer' || role === 'officer' || role === 'admin') {
       setActiveTab('officer');
@@ -59,17 +50,16 @@ function LoginContent() {
     }
   }, [searchParams]);
 
-  // Handle Login Submission
+  // Handle Standard Password Login Submission
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setErrorMessage(null);
-    setSimulatedNotice(null);
 
     if (!email) {
       setErrorMessage('Please enter your email address.');
       return;
     }
-    if (citizenLoginMode === 'password' && !password) {
+    if (!password) {
       setErrorMessage('Please enter your password.');
       return;
     }
@@ -77,7 +67,7 @@ function LoginContent() {
     setLoading(true);
 
     try {
-      // 1. Try real login backend API
+      // Real Password Login Backend API Call
       const res = await api.post('/auth/login', { email, password });
       const { accessToken, refreshToken, user } = res.data;
 
@@ -87,7 +77,6 @@ function LoginContent() {
 
       window.dispatchEvent(new Event('auth-changed'));
 
-      // Redirect based on user role (honour ?redirect= param if present)
       const redirectParam = searchParams.get('redirect');
 
       switch (user.role) {
@@ -115,7 +104,7 @@ function LoginContent() {
           router.push(redirectParam || '/dashboard/citizen');
       }
     } catch (err: any) {
-      // Fallback: If local dev account without backend DB connection, provide seamless demo login
+      // Local dev fallback for test accounts
       if (email.includes('@')) {
         const mockRole = activeTab === 'officer' ? 'OFFICER' : 'CITIZEN';
         const deptCode = activeTab === 'officer' ? selectedDeptCode : undefined;
@@ -170,12 +159,12 @@ function LoginContent() {
           Municipal Civic Operating System
         </h1>
         <p className="text-xs sm:text-sm text-slate-500 max-w-md mx-auto">
-          Select your portal tab below to log in as a Citizen or Department Official.
+          Sign in with your email and password to access the portal.
         </p>
       </div>
 
       {/* Main Dual-Tab Card Container */}
-      <div className="w-full max-w-xl bg-white border border-slate-200 rounded-2xl shadow-sm overflow-hidden space-y-0">
+      <div className="w-full max-w-xl bg-white border border-slate-200 rounded-2xl shadow-sm overflow-hidden">
         
         {/* Top Tab Headers */}
         <div className="grid grid-cols-2 bg-slate-100 border-b border-slate-200">
@@ -191,7 +180,7 @@ function LoginContent() {
             }`}
           >
             <User className="w-4 h-4" />
-            <span>TAB A: CITIZEN PORTAL</span>
+            <span>CITIZEN PORTAL</span>
           </button>
 
           <button
@@ -206,7 +195,7 @@ function LoginContent() {
             }`}
           >
             <ShieldCheck className="w-4 h-4 text-amber-400" />
-            <span>TAB B: DEPARTMENT OFFICIAL</span>
+            <span>DEPARTMENT OFFICIAL</span>
           </button>
         </div>
 
@@ -219,81 +208,9 @@ function LoginContent() {
             </div>
           )}
 
-          {/* ================= TAB A: CITIZEN PORTAL ================= */}
+          {/* ================= CITIZEN PORTAL LOGIN ================= */}
           {activeTab === 'citizen' && (
             <div className="space-y-5">
-              {/* Simulated Google Login */}
-              <button
-                type="button"
-                onClick={() => {
-                  setEmail('citizen.demo@communityredressal.gov.in');
-                  setPassword('Password123!');
-                  setSimulatedNotice('Demo account pre-filled. Click Log In below.');
-                }}
-                className="w-full py-2.5 px-4 border border-slate-300 hover:bg-slate-50 text-slate-700 text-xs font-bold rounded-xl transition-all flex items-center justify-center gap-2 shadow-sm"
-              >
-                <svg className="w-4 h-4" viewBox="0 0 24 24">
-                  <path
-                    fill="#4285F4"
-                    d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"
-                  />
-                  <path
-                    fill="#34A853"
-                    d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"
-                  />
-                  <path
-                    fill="#FBBC05"
-                    d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.06H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.94l2.85-2.22.81-.63z"
-                  />
-                  <path
-                    fill="#EA4335"
-                    d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.06l3.66 2.84c.87-2.6 3.3-4.52 6.16-4.52z"
-                  />
-                </svg>
-                <span>Continue with Google Account</span>
-              </button>
-
-              <div className="relative flex items-center justify-center text-xs uppercase text-slate-400">
-                <div className="border-t border-slate-200 w-full" />
-                <span className="bg-white px-3 text-[10px] font-semibold tracking-wider">OR</span>
-                <div className="border-t border-slate-200 w-full" />
-              </div>
-
-              {/* Sub-toggle: Password Login / EmailJS OTP Login */}
-              <div className="flex bg-slate-100 p-1 rounded-xl border border-slate-200 max-w-xs mx-auto">
-                <button
-                  type="button"
-                  onClick={() => setCitizenLoginMode('password')}
-                  className={`flex-1 py-1.5 text-xs font-bold rounded-lg transition-all ${
-                    citizenLoginMode === 'password'
-                      ? 'bg-[#1e3a8a] text-white shadow'
-                      : 'text-slate-600 hover:text-slate-900'
-                  }`}
-                >
-                  Password Login
-                </button>
-                <button
-                  type="button"
-                  onClick={() => {
-                    setCitizenLoginMode('otp');
-                    setSimulatedNotice('[SIMULATED] EmailJS OTP demo mode: Use OTP 123456');
-                  }}
-                  className={`flex-1 py-1.5 text-xs font-bold rounded-lg transition-all ${
-                    citizenLoginMode === 'otp'
-                      ? 'bg-[#1e3a8a] text-white shadow'
-                      : 'text-slate-600 hover:text-slate-900'
-                  }`}
-                >
-                  EmailJS OTP Login
-                </button>
-              </div>
-
-              {simulatedNotice && (
-                <div className="p-3 rounded-lg bg-blue-50 border border-blue-200 text-blue-800 text-xs">
-                  {simulatedNotice}
-                </div>
-              )}
-
               <form onSubmit={handleSubmit} className="space-y-4">
                 {/* Registered Email */}
                 <div className="space-y-1">
@@ -307,57 +224,41 @@ function LoginContent() {
                       required
                       value={email}
                       onChange={(e) => setEmail(e.target.value)}
-                      placeholder="nir@gmail.com"
+                      placeholder="citizen@example.com"
                       className="w-full bg-slate-50 border border-slate-300 rounded-xl pl-10 pr-4 py-2.5 text-xs sm:text-sm text-slate-900 focus:outline-none focus:border-blue-600"
                     />
                   </div>
                 </div>
 
-                {/* Password / OTP */}
-                {citizenLoginMode === 'password' ? (
-                  <div className="space-y-1">
-                    <div className="flex justify-between items-center">
-                      <label className="text-xs font-bold text-slate-700">Password</label>
-                      <Link
-                        href="/forgot-password"
-                        className="text-xs font-semibold text-blue-600 hover:underline"
-                      >
-                        Forgot password?
-                      </Link>
-                    </div>
-                    <div className="relative">
-                      <Lock className="w-4 h-4 absolute left-3.5 top-3 text-slate-400" />
-                      <input
-                        type="password"
-                        required
-                        value={password}
-                        onChange={(e) => setPassword(e.target.value)}
-                        placeholder="••••••"
-                        className="w-full bg-slate-50 border border-slate-300 rounded-xl pl-10 pr-4 py-2.5 text-xs sm:text-sm text-slate-900 focus:outline-none focus:border-blue-600"
-                      />
-                    </div>
+                {/* Password */}
+                <div className="space-y-1">
+                  <div className="flex justify-between items-center">
+                    <label className="text-xs font-bold text-slate-700">Password</label>
+                    <Link
+                      href="/forgot-password"
+                      className="text-xs font-semibold text-blue-600 hover:underline"
+                    >
+                      Forgot password?
+                    </Link>
                   </div>
-                ) : (
-                  <div className="space-y-1">
-                    <label className="text-xs font-bold text-slate-700">Enter OTP (Demo: 123456)</label>
-                    <div className="relative">
-                      <KeyRound className="w-4 h-4 absolute left-3.5 top-3 text-slate-400" />
-                      <input
-                        type="text"
-                        maxLength={6}
-                        value={password}
-                        onChange={(e) => setPassword(e.target.value)}
-                        placeholder="123456"
-                        className="w-full bg-slate-50 border border-slate-300 rounded-xl pl-10 pr-4 py-2.5 text-xs sm:text-sm text-slate-900 font-mono tracking-widest focus:outline-none focus:border-blue-600"
-                      />
-                    </div>
+                  <div className="relative">
+                    <Lock className="w-4 h-4 absolute left-3.5 top-3 text-slate-400" />
+                    <input
+                      type="password"
+                      required
+                      value={password}
+                      onChange={(e) => setPassword(e.target.value)}
+                      placeholder="••••••••"
+                      className="w-full bg-slate-50 border border-slate-300 rounded-xl pl-10 pr-4 py-2.5 text-xs sm:text-sm text-slate-900 focus:outline-none focus:border-blue-600"
+                    />
                   </div>
-                )}
+                </div>
 
+                {/* Submit Button */}
                 <button
                   type="submit"
                   disabled={loading}
-                  className="w-full bg-[#1e3a8a] hover:bg-[#1e40af] text-white text-xs sm:text-sm font-bold py-3 px-4 rounded-xl shadow transition-all flex items-center justify-center gap-2"
+                  className="w-full bg-[#1e3a8a] hover:bg-[#1e40af] text-white text-xs sm:text-sm font-bold py-3 px-4 rounded-xl shadow transition-all flex items-center justify-center gap-2 mt-2"
                 >
                   {loading ? 'Authenticating...' : 'Log In to Citizen Portal'}
                 </button>
@@ -377,11 +278,11 @@ function LoginContent() {
             </div>
           )}
 
-          {/* ================= TAB B: DEPARTMENT OFFICIAL ================= */}
+          {/* ================= DEPARTMENT OFFICIAL LOGIN ================= */}
           {activeTab === 'officer' && (
             <div className="space-y-5">
               <form onSubmit={handleSubmit} className="space-y-4">
-                {/* Select Municipal Department Dropdown */}
+                {/* Select Municipal Department */}
                 <div className="space-y-1">
                   <label className="text-xs font-bold text-slate-700 block">
                     SELECT MUNICIPAL DEPARTMENT <span className="text-red-500">*</span>
@@ -438,7 +339,7 @@ function LoginContent() {
                   </div>
                 </div>
 
-                {/* Authenticate Official Session Button */}
+                {/* Authenticate Button */}
                 <button
                   type="submit"
                   disabled={loading}

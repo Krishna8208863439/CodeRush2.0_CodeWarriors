@@ -59,6 +59,56 @@
       "is_verified": false,
       "is_locked": false,
       "created_at": "2026-08-07T10:28:42.829Z"
+    },
+    {
+      "id": "cb280893-69ca-403f-8521-fc519484a95c",
+      "name": "Phase 1A Tester",
+      "email": "citizen_phase1a_1786116223772@communityredressal.gov.in",
+      "password_hash": "$2b$12$znyJfGw3r/W.aq/3RHVT6.Xvt7lY3I4i27mxL74eWBBHAuOmHYjNu",
+      "role": "CITIZEN",
+      "is_verified": false,
+      "is_locked": false,
+      "created_at": "2026-08-07T15:23:44.284Z"
+    },
+    {
+      "id": "772cbbde-b8b5-4d35-af15-915b5f4c4dcc",
+      "name": "All Channels Tester",
+      "email": "all_channels_1786117672447@communityredressal.gov.in",
+      "password_hash": "$2b$12$H8jdz6ytanc9NvJVbeA3PeiKNupo8h8AxKysN7fyQ/A1zV8OT4lMC",
+      "role": "CITIZEN",
+      "is_verified": false,
+      "is_locked": false,
+      "created_at": "2026-08-07T15:47:52.759Z"
+    },
+    {
+      "id": "a8618150-55c6-442b-a33d-93b2aaf7a799",
+      "name": "Phase 1A Tester",
+      "email": "citizen_phase1a_1786117744484@communityredressal.gov.in",
+      "password_hash": "$2b$12$FTYwzcIJeekgHX6BysbeNei.P0V1pTwd9HDcG.D9tv5bW0jrZWWzO",
+      "role": "CITIZEN",
+      "is_verified": false,
+      "is_locked": false,
+      "created_at": "2026-08-07T15:49:04.774Z"
+    },
+    {
+      "id": "022aefea-874c-425a-aba7-86089cceeefb",
+      "name": "All Channels Tester",
+      "email": "all_channels_1786117930824@communityredressal.gov.in",
+      "password_hash": "$2b$12$TLVi99PMPR2riB2cad7UOuCCQrU2lB0DZoQsQh1WnbQPswmEGrGxq",
+      "role": "CITIZEN",
+      "is_verified": false,
+      "is_locked": false,
+      "created_at": "2026-08-07T15:52:11.373Z"
+    },
+    {
+      "id": "cb0ca00d-6535-4860-8893-e719eae4f39f",
+      "name": "All Channels Tester",
+      "email": "all_channels_1786117945338@communityredressal.gov.in",
+      "password_hash": "$2b$12$0su9yF16FvfxBac.kVLyK.AEAiVF.IDzpms7ESXO1xkx.5x6gnome",
+      "role": "CITIZEN",
+      "is_verified": false,
+      "is_locked": false,
+      "created_at": "2026-08-07T15:52:25.742Z"
     }
   ],
   "citizens": [
@@ -91,6 +141,31 @@
       "id": "2e8cdadb-5af3-4594-9451-ccbde139c97a",
       "user_id": "b60491ea-e274-493f-b425-dd5b32662bec",
       "created_at": "2026-08-07T10:28:42.835Z"
+    },
+    {
+      "id": "65e07ff8-799d-4512-bb9c-3a0f3762e915",
+      "user_id": "cb280893-69ca-403f-8521-fc519484a95c",
+      "created_at": "2026-08-07T15:23:44.287Z"
+    },
+    {
+      "id": "f04e30ea-613c-41c1-bc9d-7194662b5335",
+      "user_id": "772cbbde-b8b5-4d35-af15-915b5f4c4dcc",
+      "created_at": "2026-08-07T15:47:52.762Z"
+    },
+    {
+      "id": "fce6f95b-170d-4e7d-aa0b-f9bcab063a82",
+      "user_id": "a8618150-55c6-442b-a33d-93b2aaf7a799",
+      "created_at": "2026-08-07T15:49:04.778Z"
+    },
+    {
+      "id": "0c865580-0418-491c-b1da-fa6cc3d200e3",
+      "user_id": "022aefea-874c-425a-aba7-86089cceeefb",
+      "created_at": "2026-08-07T15:52:11.377Z"
+    },
+    {
+      "id": "a078a4e0-3e88-4f07-919e-c148f84ee554",
+      "user_id": "cb0ca00d-6535-4860-8893-e719eae4f39f",
+      "created_at": "2026-08-07T15:52:25.745Z"
     }
   ],
   "refresh_tokens": [
@@ -243,8 +318,168 @@
       "user_id": "bafb93c7-8da1-40ba-b7f5-3ed1986d25a2",
       "token_hash": "21010beae3513567e400a0038e7acb3d77c1ef4b29f521907ff5bc0e4c983548",
       "expires_at": "2026-08-14T12:29:38.261Z",
-      "revoked": false,
+      "revoked": true,
       "created_at": "2026-08-07T12:29:38.264Z"
+    },
+    {
+      "id": "eea55376-ba94-425e-951b-e7a6ec8b899c",
+      "user_id": "bafb93c7-8da1-40ba-b7f5-3ed1986d25a2",
+      "token_hash": "ceedbb9e2602745aed9b691ee92aed475df2ca02932e826c58f538adc312f48e",
+      "expires_at": "2026-08-14T15:20:00.271Z",
+      "revoked": false,
+      "created_at": "2026-08-07T15:20:00.277Z"
+    },
+    {
+      "id": "dae0ad79-58cf-4d08-b8d8-fc682a3fc232",
+      "user_id": "cb280893-69ca-403f-8521-fc519484a95c",
+      "token_hash": "c6392a342daa5bef14a66cbb4c8bba2974fa4a9fe1ffbb45049a83e13fa43b86",
+      "expires_at": "2026-08-14T15:23:44.549Z",
+      "revoked": false,
+      "created_at": "2026-08-07T15:23:44.551Z"
+    },
+    {
+      "id": "4e045a79-dcdb-4a2f-9dfe-682d19f81361",
+      "user_id": "bafb93c7-8da1-40ba-b7f5-3ed1986d25a2",
+      "token_hash": "596bf41daf88241316c1c8acad27e6aa899927029ddf0d39edcbe339d038e022",
+      "expires_at": "2026-08-14T15:24:42.744Z",
+      "revoked": true,
+      "created_at": "2026-08-07T15:24:42.745Z"
+    },
+    {
+      "id": "f48ed914-6e11-4f63-95ec-37e05e692a89",
+      "user_id": "bafb93c7-8da1-40ba-b7f5-3ed1986d25a2",
+      "token_hash": "d2733a49e500d1776959db233f62291143bc6cf11f0d4ac95d27bb37df0cbd34",
+      "expires_at": "2026-08-14T15:32:46.659Z",
+      "revoked": false,
+      "created_at": "2026-08-07T15:32:46.661Z"
+    },
+    {
+      "id": "a0ae7ddd-9613-4068-9425-21b99120e2a8",
+      "user_id": "bafb93c7-8da1-40ba-b7f5-3ed1986d25a2",
+      "token_hash": "e9312eea9ea5af2f768d5bdf2c9d8de7d504438f385c648577fa2a47d991dba0",
+      "expires_at": "2026-08-14T15:35:10.732Z",
+      "revoked": false,
+      "created_at": "2026-08-07T15:35:10.732Z"
+    },
+    {
+      "id": "e5eb78f1-1a31-413e-9ea3-4a78cff3695a",
+      "user_id": "bafb93c7-8da1-40ba-b7f5-3ed1986d25a2",
+      "token_hash": "0a6a2ce897419063eba7c813a67880a55791ababeccb1d0ea101bbebb809d86b",
+      "expires_at": "2026-08-14T15:40:59.323Z",
+      "revoked": false,
+      "created_at": "2026-08-07T15:40:59.323Z"
+    },
+    {
+      "id": "52fd0654-c95c-4999-b9b5-d71f87ee20d7",
+      "user_id": "bafb93c7-8da1-40ba-b7f5-3ed1986d25a2",
+      "token_hash": "e2fb0caac8016399cf5c89d7f804cd3a836ef2af486284d0e60a5b59c3e75e53",
+      "expires_at": "2026-08-14T15:41:03.963Z",
+      "revoked": false,
+      "created_at": "2026-08-07T15:41:03.964Z"
+    },
+    {
+      "id": "df0ae444-a76b-4e0e-ab21-09a76d3fcad8",
+      "user_id": "bafb93c7-8da1-40ba-b7f5-3ed1986d25a2",
+      "token_hash": "8438a103a82f4bb7ae7c261e5bb0b73c2b7587a3460e2d63fbcd9b6977898e38",
+      "expires_at": "2026-08-14T15:41:05.791Z",
+      "revoked": false,
+      "created_at": "2026-08-07T15:41:05.793Z"
+    },
+    {
+      "id": "e2cb12df-3c87-411e-a709-349385b77f3c",
+      "user_id": "bafb93c7-8da1-40ba-b7f5-3ed1986d25a2",
+      "token_hash": "4e06d1d14afebf1f0e17d6ff436ebdb702ec8bfa13210b48edadab6991f833e9",
+      "expires_at": "2026-08-14T15:41:06.713Z",
+      "revoked": false,
+      "created_at": "2026-08-07T15:41:06.715Z"
+    },
+    {
+      "id": "a17dc6fc-5261-40c6-bf31-771562fe0d5f",
+      "user_id": "bafb93c7-8da1-40ba-b7f5-3ed1986d25a2",
+      "token_hash": "8a48934ebd3f8e91e8c8a3e6dd75483ad2e7006f2159182fd30d20555b476180",
+      "expires_at": "2026-08-14T15:41:10.107Z",
+      "revoked": false,
+      "created_at": "2026-08-07T15:41:10.108Z"
+    },
+    {
+      "id": "83c62dd4-8f4a-47f8-b07b-8eb5b5bde176",
+      "user_id": "bafb93c7-8da1-40ba-b7f5-3ed1986d25a2",
+      "token_hash": "c5681f917303f6733878b8980defb9f170933bb0d877ae1490bcbea0537324bb",
+      "expires_at": "2026-08-14T15:41:13.881Z",
+      "revoked": false,
+      "created_at": "2026-08-07T15:41:13.883Z"
+    },
+    {
+      "id": "e51e480e-c8c3-49ee-97ab-576e099a48a0",
+      "user_id": "bafb93c7-8da1-40ba-b7f5-3ed1986d25a2",
+      "token_hash": "9f7e100a6c819a5a2a20ce83a4664a856525ae574f0ec228444711eac8e82a13",
+      "expires_at": "2026-08-14T15:41:15.161Z",
+      "revoked": false,
+      "created_at": "2026-08-07T15:41:15.163Z"
+    },
+    {
+      "id": "c603de2a-936b-4a3e-92c4-894bfef09e6a",
+      "user_id": "bafb93c7-8da1-40ba-b7f5-3ed1986d25a2",
+      "token_hash": "d24078e17cb78889992fdd663550fe604c9c03439ad9a257cd1e0cd940c0478a",
+      "expires_at": "2026-08-14T15:41:29.701Z",
+      "revoked": false,
+      "created_at": "2026-08-07T15:41:29.702Z"
+    },
+    {
+      "id": "181c06b2-eaaf-466b-a468-431e2a6a5e9e",
+      "user_id": "bafb93c7-8da1-40ba-b7f5-3ed1986d25a2",
+      "token_hash": "035acf5c4ea378ea4bfef25928dcb64ecafbe8ac0cb6fe2a67480d0b39d981e4",
+      "expires_at": "2026-08-14T15:42:58.210Z",
+      "revoked": false,
+      "created_at": "2026-08-07T15:42:58.211Z"
+    },
+    {
+      "id": "655b581f-3a09-4109-ad24-0b08fcac17b1",
+      "user_id": "bafb93c7-8da1-40ba-b7f5-3ed1986d25a2",
+      "token_hash": "6c55eec4c5a407fc4d3feb416b11ac4f2f52175a32e62961d09d37ac7dac3745",
+      "expires_at": "2026-08-14T15:43:08.761Z",
+      "revoked": false,
+      "created_at": "2026-08-07T15:43:08.762Z"
+    },
+    {
+      "id": "95a42617-273e-481b-a97a-c9c81c946385",
+      "user_id": "bafb93c7-8da1-40ba-b7f5-3ed1986d25a2",
+      "token_hash": "720fed67c9281c0b2192aecf7b97f4492dc3b3e15e96e1f734397efafbd1f1a9",
+      "expires_at": "2026-08-14T15:44:26.000Z",
+      "revoked": false,
+      "created_at": "2026-08-07T15:44:26.001Z"
+    },
+    {
+      "id": "6ee3e023-8ab8-45d8-ae33-25ed95e65a6c",
+      "user_id": "772cbbde-b8b5-4d35-af15-915b5f4c4dcc",
+      "token_hash": "6e76a0902926944201d51e03ce8c7a212151548d4af3d6ea0c1c8d7509a5243c",
+      "expires_at": "2026-08-14T15:47:53.019Z",
+      "revoked": false,
+      "created_at": "2026-08-07T15:47:53.021Z"
+    },
+    {
+      "id": "4a4b2f82-efdd-4e7c-817d-37e466a42567",
+      "user_id": "a8618150-55c6-442b-a33d-93b2aaf7a799",
+      "token_hash": "058c799e3cad7f4f4f969b58871b5d5e311c76e98fbae778f9b5b8ea20c1ae32",
+      "expires_at": "2026-08-14T15:49:05.046Z",
+      "revoked": false,
+      "created_at": "2026-08-07T15:49:05.047Z"
+    },
+    {
+      "id": "61b62e2b-2aef-45c9-b4f3-4c24026b99f5",
+      "user_id": "022aefea-874c-425a-aba7-86089cceeefb",
+      "token_hash": "c75b64c8253846d89f570e4f4389a65695f98a44202c10e65eb7c3d4907dd921",
+      "expires_at": "2026-08-14T15:52:11.827Z",
+      "revoked": false,
+      "created_at": "2026-08-07T15:52:11.829Z"
+    },
+    {
+      "id": "99748b89-a6ad-4dd6-9d98-b6a9d193c497",
+      "user_id": "cb0ca00d-6535-4860-8893-e719eae4f39f",
+      "token_hash": "faf15d0443504e26a15d3fade0b1bbf20b637b4c50470f198ff9444493d052a2",
+      "expires_at": "2026-08-14T15:52:26.122Z",
+      "revoked": false,
+      "created_at": "2026-08-07T15:52:26.124Z"
     }
   ],
   "password_reset_tokens": [
@@ -413,6 +648,104 @@
       "consent_version": "v1.0",
       "granted": true,
       "created_at": "2026-08-07T12:32:49.885Z"
+    },
+    {
+      "id": "c72e6c12-d9e8-426a-a583-0de56a0ab563",
+      "citizen_id": "cb280893-69ca-403f-8521-fc519484a95c",
+      "consent_version": "v1.0",
+      "granted": true,
+      "created_at": "2026-08-07T15:23:44.557Z"
+    },
+    {
+      "id": "3258689d-95fd-40d0-b8c8-513a056b195c",
+      "citizen_id": "bafb93c7-8da1-40ba-b7f5-3ed1986d25a2",
+      "consent_version": "v1.0",
+      "granted": true,
+      "created_at": "2026-08-07T15:30:04.320Z"
+    },
+    {
+      "id": "65b1fc74-831a-4ace-b7b1-9634bc7cae27",
+      "citizen_id": "772cbbde-b8b5-4d35-af15-915b5f4c4dcc",
+      "consent_version": "v1.0",
+      "granted": true,
+      "created_at": "2026-08-07T15:47:53.028Z"
+    },
+    {
+      "id": "4218fa6a-114d-4347-8598-5e6116765129",
+      "citizen_id": "772cbbde-b8b5-4d35-af15-915b5f4c4dcc",
+      "consent_version": "v1.0",
+      "granted": true,
+      "created_at": "2026-08-07T15:47:53.740Z"
+    },
+    {
+      "id": "1bb6ead2-844b-46cd-9a5c-2841b6312885",
+      "citizen_id": "772cbbde-b8b5-4d35-af15-915b5f4c4dcc",
+      "consent_version": "v1.0",
+      "granted": true,
+      "created_at": "2026-08-07T15:47:54.356Z"
+    },
+    {
+      "id": "78bcb198-6cf0-4d33-8a5e-e6000a390fc0",
+      "citizen_id": "772cbbde-b8b5-4d35-af15-915b5f4c4dcc",
+      "consent_version": "v1.0",
+      "granted": true,
+      "created_at": "2026-08-07T15:47:55.376Z"
+    },
+    {
+      "id": "c2ed3a6d-a955-40a1-8e48-7e2d6515b290",
+      "citizen_id": "772cbbde-b8b5-4d35-af15-915b5f4c4dcc",
+      "consent_version": "v1.0",
+      "granted": true,
+      "created_at": "2026-08-07T15:47:56.312Z"
+    },
+    {
+      "id": "26dc4c97-b7ca-4b03-8d0f-059ef4ad6dd3",
+      "citizen_id": "a8618150-55c6-442b-a33d-93b2aaf7a799",
+      "consent_version": "v1.0",
+      "granted": true,
+      "created_at": "2026-08-07T15:49:05.052Z"
+    },
+    {
+      "id": "697d22b2-1e80-49a8-9900-4e90b3bd4fb3",
+      "citizen_id": "022aefea-874c-425a-aba7-86089cceeefb",
+      "consent_version": "v1.0",
+      "granted": true,
+      "created_at": "2026-08-07T15:52:11.841Z"
+    },
+    {
+      "id": "3771fa7b-d1dd-432c-8362-6b23b8495303",
+      "citizen_id": "cb0ca00d-6535-4860-8893-e719eae4f39f",
+      "consent_version": "v1.0",
+      "granted": true,
+      "created_at": "2026-08-07T15:52:26.130Z"
+    },
+    {
+      "id": "a11810f9-84ce-487c-b97e-56213e393817",
+      "citizen_id": "cb0ca00d-6535-4860-8893-e719eae4f39f",
+      "consent_version": "v1.0",
+      "granted": true,
+      "created_at": "2026-08-07T15:52:26.322Z"
+    },
+    {
+      "id": "fa7043fa-007c-4b6f-b33e-72a12d820f02",
+      "citizen_id": "cb0ca00d-6535-4860-8893-e719eae4f39f",
+      "consent_version": "v1.0",
+      "granted": true,
+      "created_at": "2026-08-07T15:52:27.270Z"
+    },
+    {
+      "id": "47159c78-97ad-4b12-aa83-28c4de4811ba",
+      "citizen_id": "cb0ca00d-6535-4860-8893-e719eae4f39f",
+      "consent_version": "v1.0",
+      "granted": true,
+      "created_at": "2026-08-07T15:52:28.163Z"
+    },
+    {
+      "id": "0e9a940b-bc55-46ca-9e85-bfd437efd9ed",
+      "citizen_id": "cb0ca00d-6535-4860-8893-e719eae4f39f",
+      "consent_version": "v1.0",
+      "granted": true,
+      "created_at": "2026-08-07T15:52:28.985Z"
     }
   ],
   "gis_locations": [
@@ -439,6 +772,118 @@
       "longitude": 74.4077,
       "formatted_address": "Lat: 16.9454, Lon: 74.4077",
       "created_at": "2026-08-07T12:31:33.283Z"
+    },
+    {
+      "id": "c9756aa5-6f45-4537-8f1c-261beaf766b4",
+      "complaint_id": "47468cfa-d310-4424-a251-86db8fc253d7",
+      "latitude": 19.076,
+      "longitude": 72.8777,
+      "formatted_address": "[Ward: Kurla West] Shahid Major Kaustubh Rane flyover, Hallow Pul, Kurla West, L Ward, Mumbai Zone 5, Mumbai, Mumbai Suburban District, Maharashtra, 400070, India",
+      "created_at": "2026-08-07T15:23:45.043Z"
+    },
+    {
+      "id": "2644fe6d-f566-4fd8-bfef-f4bc0f4d945f",
+      "complaint_id": "636bd36d-8875-4d69-8361-7fdec7582ec2",
+      "latitude": 16.5795,
+      "longitude": 74.3131,
+      "formatted_address": "[Ward: Kagal] Sharada hotel, Kagal S.T.Stand, Kagal, Kolhapur, Maharashtra, 416216, India",
+      "created_at": "2026-08-07T15:30:05.048Z"
+    },
+    {
+      "id": "840b6d93-cb56-404f-9a5d-10a4d842655d",
+      "complaint_id": "a7ae2106-cae3-4ddd-9d02-b2ec000c4c8e",
+      "latitude": 19.076,
+      "longitude": 72.8777,
+      "formatted_address": "[Ward: Kurla West] Shahid Major Kaustubh Rane flyover, Hallow Pul, Kurla West, L Ward, Mumbai Zone 5, Mumbai, Mumbai Suburban District, Maharashtra, 400070, India",
+      "created_at": "2026-08-07T15:47:53.721Z"
+    },
+    {
+      "id": "21753071-f807-4dca-9e79-d710f9dd9934",
+      "complaint_id": "ea672365-f2c4-4ec0-8884-33f619ed74ef",
+      "latitude": 19.08,
+      "longitude": 72.88,
+      "formatted_address": "[Ward: Kurla West] ZamZam Sweets and Bakery, Lal Bahadur Shastri Marg, Hallow Pul, Kurla West, L Ward, Mumbai Zone 5, Mumbai, Mumbai Suburban District, Maharashtra, 400070, India",
+      "created_at": "2026-08-07T15:47:54.049Z"
+    },
+    {
+      "id": "896485ea-b67e-4a38-99b1-d9c534b577f1",
+      "complaint_id": "aa7390ef-39ec-42c2-9cb0-68b70400236d",
+      "latitude": 19.085,
+      "longitude": 72.885,
+      "formatted_address": "[Ward: Asalpha] Father Peter Periera Road, Sunder Baug, Asalpha, L Ward, Mumbai Zone 5, Mumbai, Mumbai Suburban District, Maharashtra, 400070, India",
+      "created_at": "2026-08-07T15:47:54.905Z"
+    },
+    {
+      "id": "a3bf9535-0a1c-4869-92bf-729be924dd1c",
+      "complaint_id": "4e91429a-b1c5-447e-8abe-271be2deaa04",
+      "latitude": 19.09,
+      "longitude": 72.89,
+      "formatted_address": "[Ward: Asalpha] Kamani, Asalpha, L Ward, Mumbai Zone 5, Mumbai, Mumbai Suburban District, Maharashtra, 400070, India",
+      "created_at": "2026-08-07T15:47:56.052Z"
+    },
+    {
+      "id": "79a69b5b-08d8-4138-b30e-ea65770755a8",
+      "complaint_id": "29e259cb-f885-4933-815f-008a3fa19cad",
+      "latitude": 19.095,
+      "longitude": 72.895,
+      "formatted_address": "[Ward: Asalpha] Narayan Nagar, Asalpha, L Ward, Mumbai Zone 5, Mumbai, Mumbai Suburban District, Maharashtra, 400071, India",
+      "created_at": "2026-08-07T15:47:56.882Z"
+    },
+    {
+      "id": "a275478f-4dac-4746-94bc-5f625bf031ad",
+      "complaint_id": "69a1c933-8aa0-4bf2-9198-f42663c8b69a",
+      "latitude": 19.076,
+      "longitude": 72.8777,
+      "formatted_address": "[Ward: Kurla West] Shahid Major Kaustubh Rane flyover, Hallow Pul, Kurla West, L Ward, Mumbai Zone 5, Mumbai, Mumbai Suburban District, Maharashtra, 400070, India",
+      "created_at": "2026-08-07T15:49:05.215Z"
+    },
+    {
+      "id": "8308db5d-f4d0-4a7d-bd15-acb6c874050d",
+      "complaint_id": "2ddb2666-85c2-481e-a2ff-b7bab75a3591",
+      "latitude": 19.076,
+      "longitude": 72.8777,
+      "formatted_address": "[Ward: Kurla West] Shahid Major Kaustubh Rane flyover, Hallow Pul, Kurla West, L Ward, Mumbai Zone 5, Mumbai, Mumbai Suburban District, Maharashtra, 400070, India",
+      "created_at": "2026-08-07T15:52:12.027Z"
+    },
+    {
+      "id": "606c68e5-cbf9-4f92-87ef-a43f42854947",
+      "complaint_id": "c19a6af7-c65a-4d6d-8ef6-5f7abf5e846b",
+      "latitude": 19.076,
+      "longitude": 72.8777,
+      "formatted_address": "[Ward: Kurla West] Shahid Major Kaustubh Rane flyover, Hallow Pul, Kurla West, L Ward, Mumbai Zone 5, Mumbai, Mumbai Suburban District, Maharashtra, 400070, India",
+      "created_at": "2026-08-07T15:52:26.311Z"
+    },
+    {
+      "id": "302cf670-060c-4c95-ae8e-bacd42c0f201",
+      "complaint_id": "05a9e368-05c0-4c60-988a-13e0809ff946",
+      "latitude": 19.08,
+      "longitude": 72.88,
+      "formatted_address": "[Ward: Kurla West] ZamZam Sweets and Bakery, Lal Bahadur Shastri Marg, Hallow Pul, Kurla West, L Ward, Mumbai Zone 5, Mumbai, Mumbai Suburban District, Maharashtra, 400070, India",
+      "created_at": "2026-08-07T15:52:26.877Z"
+    },
+    {
+      "id": "d24c331e-6cda-4f50-bc79-2f2c277e80f1",
+      "complaint_id": "b558d59b-6973-4120-b193-410f6ed1b42b",
+      "latitude": 19.085,
+      "longitude": 72.885,
+      "formatted_address": "[Ward: Asalpha] Father Peter Periera Road, Sunder Baug, Asalpha, L Ward, Mumbai Zone 5, Mumbai, Mumbai Suburban District, Maharashtra, 400070, India",
+      "created_at": "2026-08-07T15:52:27.862Z"
+    },
+    {
+      "id": "d5633b5f-acb8-4015-b98a-15b74c640e23",
+      "complaint_id": "fb5b8776-9ffa-4313-9187-093e621ba878",
+      "latitude": 19.09,
+      "longitude": 72.89,
+      "formatted_address": "[Ward: Asalpha] Kamani, Asalpha, L Ward, Mumbai Zone 5, Mumbai, Mumbai Suburban District, Maharashtra, 400070, India",
+      "created_at": "2026-08-07T15:52:28.702Z"
+    },
+    {
+      "id": "e1d531d2-1394-4633-9262-fc57c2b2f56d",
+      "complaint_id": "382b5ec5-0ede-45e8-9ea9-d19e3597d859",
+      "latitude": 19.095,
+      "longitude": 72.895,
+      "formatted_address": "[Ward: Asalpha] Narayan Nagar, Asalpha, L Ward, Mumbai Zone 5, Mumbai, Mumbai Suburban District, Maharashtra, 400071, India",
+      "created_at": "2026-08-07T15:52:29.893Z"
     }
   ],
   "status_history": [],
@@ -511,6 +956,160 @@
       "language": "EN",
       "status": "SUBMITTED",
       "created_at": "2026-08-07T12:32:49.894Z"
+    },
+    {
+      "id": "47468cfa-d310-4424-a251-86db8fc253d7",
+      "reference_id": "CRP-2026-809135",
+      "citizen_id": "cb280893-69ca-403f-8521-fc519484a95c",
+      "title": "Overflowing Municipal Garbage Bin Near Ward 4 Main Road",
+      "description": "The garbage container near the main market square has been overflowing for over 3 days, causing severe odour and health hazard to local residents.",
+      "channel": "TEXT",
+      "language": "EN",
+      "status": "SUBMITTED",
+      "created_at": "2026-08-07T15:23:44.561Z"
+    },
+    {
+      "id": "636bd36d-8875-4d69-8361-7fdec7582ec2",
+      "reference_id": "CRP-2026-288903",
+      "citizen_id": "bafb93c7-8da1-40ba-b7f5-3ed1986d25a2",
+      "title": "overflowing",
+      "description": "kolhapur aur mhakave",
+      "channel": "TEXT",
+      "language": "EN",
+      "status": "SUBMITTED",
+      "created_at": "2026-08-07T15:30:04.330Z"
+    },
+    {
+      "id": "a7ae2106-cae3-4ddd-9d02-b2ec000c4c8e",
+      "reference_id": "CRP-2026-457606",
+      "citizen_id": "772cbbde-b8b5-4d35-af15-915b5f4c4dcc",
+      "title": "Pothole on Main Highway near Ward 8",
+      "description": "Dangerous deep pothole on the center lane of the highway causing traffic bottleneck and accident risk.",
+      "channel": "TEXT",
+      "language": "EN",
+      "status": "SUBMITTED",
+      "created_at": "2026-08-07T15:47:53.030Z"
+    },
+    {
+      "id": "ea672365-f2c4-4ec0-8884-33f619ed74ef",
+      "reference_id": "CRP-2026-458319",
+      "citizen_id": "772cbbde-b8b5-4d35-af15-915b5f4c4dcc",
+      "title": "Photo Evidence of Waste Dumping",
+      "description": "Photographic proof of illegal waste dump",
+      "channel": "IMAGE",
+      "language": "HI",
+      "status": "SUBMITTED",
+      "created_at": "2026-08-07T15:47:53.742Z"
+    },
+    {
+      "id": "aa7390ef-39ec-42c2-9cb0-68b70400236d",
+      "reference_id": "CRP-2026-458937",
+      "citizen_id": "772cbbde-b8b5-4d35-af15-915b5f4c4dcc",
+      "title": "Voice Note Complaint",
+      "description": "Spoken voice note regarding streetlight outage",
+      "channel": "VOICE",
+      "language": "MR",
+      "status": "SUBMITTED",
+      "created_at": "2026-08-07T15:47:54.362Z"
+    },
+    {
+      "id": "4e91429a-b1c5-447e-8abe-271be2deaa04",
+      "reference_id": "CRP-2026-459955",
+      "citizen_id": "772cbbde-b8b5-4d35-af15-915b5f4c4dcc",
+      "title": "Audio Recording of Commercial Noise",
+      "description": "Audio proof of noise violation past 10 PM",
+      "channel": "AUDIO",
+      "language": "EN",
+      "status": "SUBMITTED",
+      "created_at": "2026-08-07T15:47:55.379Z"
+    },
+    {
+      "id": "29e259cb-f885-4933-815f-008a3fa19cad",
+      "reference_id": "CRP-2026-460896",
+      "citizen_id": "772cbbde-b8b5-4d35-af15-915b5f4c4dcc",
+      "title": "Video Evidence of Drainage Overflow",
+      "description": "Recorded video of open sewage pipe leak",
+      "channel": "VIDEO",
+      "language": "EN",
+      "status": "SUBMITTED",
+      "created_at": "2026-08-07T15:47:56.321Z"
+    },
+    {
+      "id": "69a1c933-8aa0-4bf2-9198-f42663c8b69a",
+      "reference_id": "CRP-2026-529631",
+      "citizen_id": "a8618150-55c6-442b-a33d-93b2aaf7a799",
+      "title": "Overflowing Municipal Garbage Bin Near Ward 4 Main Road",
+      "description": "The garbage container near the main market square has been overflowing for over 3 days, causing severe odour and health hazard to local residents.",
+      "channel": "TEXT",
+      "language": "EN",
+      "status": "SUBMITTED",
+      "created_at": "2026-08-07T15:49:05.054Z"
+    },
+    {
+      "id": "2ddb2666-85c2-481e-a2ff-b7bab75a3591",
+      "reference_id": "CRP-2026-716421",
+      "citizen_id": "022aefea-874c-425a-aba7-86089cceeefb",
+      "title": "Pothole on Main Highway near Ward 8",
+      "description": "Dangerous deep pothole on the center lane of the highway causing traffic bottleneck and accident risk.",
+      "channel": "TEXT",
+      "language": "EN",
+      "status": "SUBMITTED",
+      "created_at": "2026-08-07T15:52:11.846Z"
+    },
+    {
+      "id": "c19a6af7-c65a-4d6d-8ef6-5f7abf5e846b",
+      "reference_id": "CRP-2026-730710",
+      "citizen_id": "cb0ca00d-6535-4860-8893-e719eae4f39f",
+      "title": "Pothole on Main Highway near Ward 8",
+      "description": "Dangerous deep pothole on the center lane of the highway causing traffic bottleneck and accident risk.",
+      "channel": "TEXT",
+      "language": "EN",
+      "status": "SUBMITTED",
+      "created_at": "2026-08-07T15:52:26.134Z"
+    },
+    {
+      "id": "05a9e368-05c0-4c60-988a-13e0809ff946",
+      "reference_id": "CRP-2026-730901",
+      "citizen_id": "cb0ca00d-6535-4860-8893-e719eae4f39f",
+      "title": "Photo Evidence of Waste Dumping",
+      "description": "Photographic proof of illegal waste dump",
+      "channel": "IMAGE",
+      "language": "EN",
+      "status": "SUBMITTED",
+      "created_at": "2026-08-07T15:52:26.324Z"
+    },
+    {
+      "id": "b558d59b-6973-4120-b193-410f6ed1b42b",
+      "reference_id": "CRP-2026-731849",
+      "citizen_id": "cb0ca00d-6535-4860-8893-e719eae4f39f",
+      "title": "Voice Note Complaint",
+      "description": "Spoken voice note regarding streetlight outage",
+      "channel": "VOICE",
+      "language": "EN",
+      "status": "SUBMITTED",
+      "created_at": "2026-08-07T15:52:27.273Z"
+    },
+    {
+      "id": "fb5b8776-9ffa-4313-9187-093e621ba878",
+      "reference_id": "CRP-2026-732742",
+      "citizen_id": "cb0ca00d-6535-4860-8893-e719eae4f39f",
+      "title": "Audio Recording of Commercial Noise",
+      "description": "Audio proof of noise violation past 10 PM",
+      "channel": "AUDIO",
+      "language": "EN",
+      "status": "SUBMITTED",
+      "created_at": "2026-08-07T15:52:28.166Z"
+    },
+    {
+      "id": "382b5ec5-0ede-45e8-9ea9-d19e3597d859",
+      "reference_id": "CRP-2026-733565",
+      "citizen_id": "cb0ca00d-6535-4860-8893-e719eae4f39f",
+      "title": "Video Evidence of Drainage Overflow",
+      "description": "Recorded video of open sewage pipe leak",
+      "channel": "VIDEO",
+      "language": "EN",
+      "status": "SUBMITTED",
+      "created_at": "2026-08-07T15:52:28.989Z"
     }
   ]
 }

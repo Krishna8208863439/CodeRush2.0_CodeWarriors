@@ -33,3 +33,6 @@ yarn-error.log*
 pgdata/
 miniodata/
 models/
+uploads/
+api/uploads/
+api/data/local_db.json

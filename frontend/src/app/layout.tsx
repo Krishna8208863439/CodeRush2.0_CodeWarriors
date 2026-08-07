@@ -22,9 +22,11 @@ export default function RootLayout({
   children: React.ReactNode;
 }) {
   return (
-    <html lang="en">
-      <body className={`${inter.variable} min-h-screen bg-[#fafafa] text-[#1f2937] antialiased font-sans`}>
-        {children}
+    <html lang="en" className="h-full bg-[#0b0f19]">
+      <body className={`${inter.variable} min-h-screen bg-[#0b0f19] text-slate-100 antialiased font-sans flex flex-col flex-1`}>
+        <div className="min-h-screen w-full bg-[#0b0f19] flex flex-col flex-1">
+          {children}
+        </div>
       </body>
     </html>
   );

@@ -72,7 +72,7 @@ export default function GovernmentCivicHomePage() {
   };
 
   return (
-    <div className="min-h-screen bg-slate-100 text-slate-800 font-sans flex flex-col w-full">
+    <div className="min-h-screen bg-[#0b0f19] text-slate-100 font-sans flex flex-col w-full flex-1">
 
       {/* ── 1. TOP UTILITY BAR ───────────────────────────────────────── */}
       <div className="bg-[#0a0f1d] text-slate-300 text-[11px] py-1.5 px-4 sm:px-8 border-b border-slate-800 w-full">

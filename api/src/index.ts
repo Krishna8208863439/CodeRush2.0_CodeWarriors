@@ -11,13 +11,16 @@ import { dashboardRouter } from './dashboards/dashboard.controller';
 import { analyticsRouter } from './analytics/analytics.controller';
 import { citizenRouter } from './citizens/citizen.controller';
 
+import path from 'path';
+
 const app = express();
 
-app.use(helmet());
+app.use(helmet({ crossOriginResourcePolicy: false }));
 app.use(cors({ origin: true, credentials: true }));
 app.use(cookieParser());
 app.use(express.json({ limit: '50mb' }));
 app.use(express.urlencoded({ extended: true, limit: '50mb' }));
+app.use('/uploads', express.static(path.join(__dirname, '../uploads')));
 
 // Health Check
 app.get('/health', (req: Request, res: Response) => {
