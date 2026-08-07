@@ -5,3 +5,33 @@ asyncpg>=0.29.0
 python-dotenv>=1.0.0
 numpy>=1.26.0
 requests>=2.31.0
+
+# Language Detection
+langdetect>=1.0.9
+
+# NLP & Entity Extraction
+spacy>=3.7.0
+
+# Sentence Embeddings (Deduplication)
+sentence-transformers>=2.7.0
+
+# Transformers (DistilBERT Classification)
+transformers>=4.40.0
+torch>=2.2.0
+
+# Priority Prediction
+xgboost>=2.0.0
+scikit-learn>=1.4.0
+
+# OCR
+easyocr>=1.7.1
+Pillow>=10.2.0
+
+# Speech-to-Text
+openai-whisper>=20231117
+
+# Object Detection (YOLOv8)
+ultralytics>=8.1.0
+
+# File uploads
+python-multipart>=0.0.9

@@ -31,7 +31,9 @@ const envSchema = z.object({
   VAPID_PRIVATE_KEY: z.string().default('mock_vapid_private_key'),
   VAPID_SUBJECT: z.string().default('mailto:admin@communityredressal.gov'),
   AI_SERVICE_URL: z.string().default('http://localhost:8000'),
+  RESEND_API_KEY: z.string().default(''),
 });
+
 
 export const config = envSchema.parse({
   PORT: process.env.API_PORT || process.env.PORT,
@@ -59,4 +61,5 @@ export const config = envSchema.parse({
   VAPID_PRIVATE_KEY: process.env.VAPID_PRIVATE_KEY,
   VAPID_SUBJECT: process.env.VAPID_SUBJECT,
   AI_SERVICE_URL: process.env.AI_SERVICE_URL,
+  RESEND_API_KEY: process.env.RESEND_API_KEY,
 });
