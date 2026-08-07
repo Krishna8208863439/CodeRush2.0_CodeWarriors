@@ -1,14 +1,12 @@
 'use client';
 
 import React, { useState, useEffect } from 'react';
-import Link from 'next/link';
 import Image from 'next/image';
 import {
-  Zap, Activity, Cpu, MapPin, BarChart2, Users,
-  CheckCircle, ArrowRight, Radio, Lock, Globe,
-  AlertTriangle, ChevronRight, Award, Leaf,
-  Navigation, ShieldCheck, PlusCircle, HelpCircle,
-  Shield, Layers, LayoutDashboard, Building2, UserCheck,
+  ShieldCheck, Activity, Cpu, MapPin, BarChart2, Users,
+  CheckCircle2, ArrowRight, AlertTriangle, PlusCircle, HelpCircle,
+  Lock, LayoutDashboard, Building2, UserCheck, Navigation, ChevronRight,
+  Clock, FileText, CheckCircle
 } from 'lucide-react';
 
 // Import sub-pages directly for Single-URL switching
@@ -23,130 +21,79 @@ import AnalyticsPage from './analytics/page';
 import PrivacyCenterPage from './privacy-center/page';
 import HelpPage from './help/page';
 
-// ── Live Feed Data ────────────────────────────────────────────────────────────
-const LIVE_COMPLAINTS = [
-  { id: 'CVG-8924', category: 'ROAD_DAMAGE',    ward: 'Ward 4 – Arterial Route',  status: 'IN_PROGRESS', priority: 'CRITICAL', ai: 98, sla: '01:45 remaining' },
-  { id: 'CVG-8910', category: 'FALLEN_TREE',    ward: 'Ward 2 – Pedestrian Path', status: 'ASSIGNED',    priority: 'HIGH',     ai: 85, sla: '08:30 remaining' },
-  { id: 'CVG-8897', category: 'STREET_LIGHT',   ward: 'Ward 7 – Elm Street',      status: 'ASSIGNED',    priority: 'MEDIUM',   ai: 92, sla: '11:15 remaining' },
-  { id: 'CVG-8810', category: 'GARBAGE',        ward: 'Ward 9 – Main St.',        status: 'RESOLVED',    priority: 'LOW',      ai: 88, sla: 'Completed 2d 4h' },
+// ── Mock Feed Data ────────────────────────────────────────────────────────────
+const MOCK_FEED = [
+  { id: 'CVG-8924', category: 'Road Damage',    location: 'Ward 4 – Arterial Route', status: 'IN_PROGRESS', priority: 'Critical', confidence: 98, sla: '1h 45m left' },
+  { id: 'CVG-8910', category: 'Fallen Tree',    location: 'Ward 2 – Park Pathway',  status: 'ASSIGNED',    priority: 'High',     confidence: 85, sla: '8h 30m left' },
+  { id: 'CVG-8897', category: 'Street Light',   location: 'Ward 7 – Main Crossing', status: 'ASSIGNED',    priority: 'Medium',   confidence: 92, sla: '11h 15m left' },
+  { id: 'CVG-8810', category: 'Garbage Dump',   location: 'Ward 9 – Market Square', status: 'RESOLVED',    priority: 'Low',      confidence: 88, sla: 'Resolved' },
 ];
 
-const STATS = [
-  { label: 'Total Incidents',       value: '1,248', delta: '+12%',  icon: Activity,    color: 'cyan'    },
-  { label: 'SLA Adherence',         value: '87.4%', delta: '+3.1%', icon: CheckCircle, color: 'emerald' },
-  { label: 'Active Deployments',    value: '42',    delta: '5 zones', icon: Users,     color: 'violet'  },
-  { label: 'Critical Breaches',     value: '14',    delta: 'needs action', icon: AlertTriangle, color: 'red' },
+const METRICS = [
+  { label: 'Total Reports Today',  value: '1,248', change: '+12% vs last week', icon: Activity },
+  { label: 'SLA Adherence Rate',   value: '87.4%', change: 'Target: 85.0%',    icon: CheckCircle2 },
+  { label: 'Active Field Officers', value: '42',    change: 'Across 5 wards',   icon: Users },
+  { label: 'Critical Escalations', value: '14',    change: 'Requires action',   icon: AlertTriangle },
 ];
 
-const AI_MODELS = [
-  { name: 'DistilBERT Classifier',   task: 'Complaint Categorisation',  pct: 96, live: true  },
-  { name: 'Sentence-Transformers',   task: 'Duplicate Detection',        pct: 94, live: true  },
-  { name: 'spaCy NER',               task: 'Entity Extraction',          pct: 93, live: true  },
-  { name: 'Whisper STT',             task: 'Voice-to-Text Intake',       pct: 95, live: true  },
-  { name: 'XGBoost Priority',        task: 'Priority Scoring',           pct: 91, live: true  },
-  { name: 'YOLOv8 Detector',         task: 'Image Evidence Detection',   pct: 89, live: false },
-];
-
-// Screenshots from stitch_civic_pulse_os
 const SCREENS = [
-  { src: '/screen-citizen.png', label: 'Citizen Portal', tabId: 'citizen', color: 'from-cyan-500 to-blue-600', icon: Users },
-  { src: '/screen-officer.png', label: 'Officer Workstation', tabId: 'officer', color: 'from-emerald-500 to-teal-600', icon: Navigation },
-  { src: '/screen-admin.png', label: 'Control Tower', tabId: 'executive', color: 'from-amber-500 to-orange-600', icon: BarChart2 },
-  { src: '/screen-auth.png', label: 'Secure Auth Portal', tabId: 'privacy', color: 'from-violet-500 to-purple-600', icon: ShieldCheck },
+  { src: '/screen-citizen.png', label: 'Citizen Portal', tabId: 'citizen', desc: 'File reports, track timeline & view officer resolution proof.' },
+  { src: '/screen-officer.png', label: 'Officer Queue', tabId: 'officer', desc: 'SLA-sorted priority queue with GPS location & proof upload.' },
+  { src: '/screen-admin.png', label: 'Control Tower', tabId: 'executive', desc: 'Commissioner analytics, SLA adherence gauges & ward heatmaps.' },
+  { src: '/screen-auth.png', label: 'Secure Auth Portal', tabId: 'privacy', desc: 'Role-based login, mobile OTP authentication & privacy consent.' },
 ];
-
-const STATUS_PILL: Record<string, string> = {
-  IN_PROGRESS: 'text-amber-400 bg-amber-950/60 border-amber-700/40',
-  ASSIGNED:    'text-blue-400 bg-blue-950/60 border-blue-700/40',
-  RESOLVED:    'text-emerald-400 bg-emerald-950/60 border-emerald-700/40',
-  SUBMITTED:   'text-slate-400 bg-slate-900/60 border-slate-700/40',
-};
-
-const PRIORITY_DOT: Record<string, string> = {
-  CRITICAL: 'bg-red-500 animate-pulse',
-  HIGH:     'bg-amber-400',
-  MEDIUM:   'bg-blue-400',
-  LOW:      'bg-slate-400',
-};
 
 function LiveClock() {
-  const [t, setT] = useState('');
+  const [time, setTime] = useState('');
   useEffect(() => {
-    const tick = () => setT(new Date().toLocaleTimeString('en-IN', { hour: '2-digit', minute: '2-digit', second: '2-digit' }));
+    const tick = () => setTime(new Date().toLocaleTimeString('en-IN', { hour: '2-digit', minute: '2-digit' }));
     tick();
     const id = setInterval(tick, 1000);
     return () => clearInterval(id);
   }, []);
-  return <span className="font-mono tabular-nums text-emerald-400 text-xs">{t} IST</span>;
+  return <span className="font-mono text-xs text-gray-500">{time} IST</span>;
 }
 
-function Bar({ pct, active }: { pct: number; active?: boolean }) {
-  return (
-    <div className="w-full h-2 rounded-full bg-[#1d2022]">
-      <div
-        className={`h-full rounded-full transition-all duration-700 ${active ? 'bg-gradient-to-r from-violet-500 to-indigo-500' : 'bg-gradient-to-r from-cyan-400 to-emerald-400'}`}
-        style={{ width: `${pct}%` }}
-      />
-    </div>
-  );
-}
-
-export default function SingleUrlCivicPulseOS() {
+export default function FlatMinimalCivicPulseOS() {
   const [activeTab, setActiveTab] = useState<
     'overview' | 'new-complaint' | 'citizen' | 'officer' | 'department' | 'executive' | 'admin' | 'map' | 'analytics' | 'privacy' | 'help'
   >('overview');
 
   const [activeScreen, setActiveScreen] = useState(0);
-  const [activeFeed, setActiveFeed] = useState(0);
-
-  useEffect(() => {
-    const id = setInterval(() => setActiveFeed(p => (p + 1) % LIVE_COMPLAINTS.length), 3000);
-    return () => clearInterval(id);
-  }, []);
 
   return (
-    <div
-      className="min-h-screen font-sans selection:bg-violet-500 selection:text-white overflow-x-hidden"
-      style={{ background: '#101415', color: '#e0e3e5' }}
-    >
-      {/* ── TOP UNIFIED CONTROL BAR ───────────────────────────────────────── */}
-      <header
-        className="sticky top-0 z-50 border-b"
-        style={{ background: 'rgba(16,20,21,0.95)', backdropFilter: 'blur(20px)', borderColor: '#272a2c' }}
-      >
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 h-14 flex items-center justify-between gap-2 overflow-x-auto">
-          {/* Logo & Clock */}
+    <div className="min-h-screen bg-[#fafafa] text-[#1f2937] font-sans antialiased">
+      {/* ── TOP NAVBAR ──────────────────────────────────────────────────────── */}
+      <header className="bg-white border-b border-gray-200 sticky top-0 z-50">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 h-16 flex items-center justify-between gap-4">
+          {/* Logo */}
           <div className="flex items-center gap-3 shrink-0">
             <button
               onClick={() => setActiveTab('overview')}
-              className="flex items-center gap-2 text-left hover:opacity-90 transition-opacity"
+              className="flex items-center gap-2.5 text-left hover:opacity-90 transition-opacity"
             >
-              <div className="w-8 h-8 rounded-xl bg-gradient-to-tr from-violet-600 to-indigo-500 flex items-center justify-center shadow-lg shadow-violet-500/20">
-                <Zap className="w-4 h-4 text-white" />
+              <div className="w-9 h-9 rounded-lg bg-blue-600 flex items-center justify-center text-white">
+                <ShieldCheck className="w-5 h-5" />
               </div>
-              <span className="text-sm font-extrabold text-white tracking-tight" style={{ fontFamily: 'Plus Jakarta Sans, Inter, sans-serif' }}>
-                Civic Pulse OS
-              </span>
+              <div>
+                <span className="font-bold text-base text-gray-900 leading-tight block">Community Redressal</span>
+                <span className="text-xs text-gray-500 font-medium">Civic Operating System</span>
+              </div>
             </button>
-            <div className="hidden lg:flex items-center gap-2 px-2.5 py-1 rounded-lg border text-[11px]"
-              style={{ background: '#1d2022', borderColor: '#45464d' }}>
-              <div className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse" />
-              <LiveClock />
-            </div>
           </div>
 
-          {/* Module Switcher Tabs */}
+          {/* Nav Tabs */}
           <nav className="flex items-center gap-1 overflow-x-auto py-1">
             {[
               { id: 'overview', label: 'Overview', icon: LayoutDashboard },
-              { id: 'new-complaint', label: 'File Grievance', icon: PlusCircle },
+              { id: 'new-complaint', label: 'File Complaint', icon: PlusCircle },
               { id: 'citizen', label: 'Citizen', icon: Users },
               { id: 'officer', label: 'Officer', icon: Navigation },
               { id: 'department', label: 'Dept Head', icon: Building2 },
-              { id: 'executive', label: 'Commissioner', icon: Award },
-              { id: 'admin', label: 'Super Admin', icon: UserCheck },
+              { id: 'executive', label: 'Commissioner', icon: BarChart2 },
+              { id: 'admin', label: 'Admin', icon: UserCheck },
               { id: 'map', label: 'GIS Map', icon: MapPin },
-              { id: 'analytics', label: 'Analytics', icon: BarChart2 },
+              { id: 'analytics', label: 'Analytics', icon: Activity },
               { id: 'privacy', label: 'Privacy', icon: Lock },
               { id: 'help', label: 'Help', icon: HelpCircle },
             ].map((t) => {
@@ -156,10 +103,10 @@ export default function SingleUrlCivicPulseOS() {
                 <button
                   key={t.id}
                   onClick={() => setActiveTab(t.id as any)}
-                  className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-bold shrink-0 transition-all ${
+                  className={`flex items-center gap-1.5 px-3 py-2 rounded-lg text-xs font-semibold shrink-0 transition-colors ${
                     isActive
-                      ? 'bg-gradient-to-r from-violet-600 to-indigo-600 text-white shadow-md shadow-violet-500/20'
-                      : 'text-[#909097] hover:text-white hover:bg-[#1d2022]'
+                      ? 'bg-blue-50 text-blue-700 border border-blue-200'
+                      : 'text-gray-600 hover:text-gray-900 hover:bg-gray-100'
                   }`}
                 >
                   <Icon className="w-3.5 h-3.5" />
@@ -168,306 +115,240 @@ export default function SingleUrlCivicPulseOS() {
               );
             })}
           </nav>
+
+          {/* Primary Action Button */}
+          <div className="shrink-0 hidden md:flex items-center gap-3">
+            <LiveClock />
+            <button
+              onClick={() => setActiveTab('new-complaint')}
+              className="btn-primary"
+            >
+              <PlusCircle className="w-4 h-4" />
+              <span>Submit Complaint</span>
+            </button>
+          </div>
         </div>
       </header>
 
       {/* ── DYNAMIC MODULE VIEW ───────────────────────────────────────────── */}
       {activeTab === 'new-complaint' && (
-        <div className="p-4"><NewComplaintPage /></div>
+        <div className="py-6 max-w-7xl mx-auto px-4"><NewComplaintPage /></div>
       )}
 
       {activeTab === 'citizen' && (
-        <div className="p-4"><CitizenDashboard /></div>
+        <div className="py-6 max-w-7xl mx-auto px-4"><CitizenDashboard /></div>
       )}
 
       {activeTab === 'officer' && (
-        <div className="p-4"><OfficerDashboard /></div>
+        <div className="py-6 max-w-7xl mx-auto px-4"><OfficerDashboard /></div>
       )}
 
       {activeTab === 'department' && (
-        <div className="p-4"><DepartmentDashboard /></div>
+        <div className="py-6 max-w-7xl mx-auto px-4"><DepartmentDashboard /></div>
       )}
 
       {activeTab === 'executive' && (
-        <div className="p-4"><ExecutiveDashboard /></div>
+        <div className="py-6 max-w-7xl mx-auto px-4"><ExecutiveDashboard /></div>
       )}
 
       {activeTab === 'admin' && (
-        <div className="p-4"><AdminDashboard /></div>
+        <div className="py-6 max-w-7xl mx-auto px-4"><AdminDashboard /></div>
       )}
 
       {activeTab === 'map' && (
-        <div className="p-4"><MapPage /></div>
+        <div className="py-6 max-w-7xl mx-auto px-4"><MapPage /></div>
       )}
 
       {activeTab === 'analytics' && (
-        <div className="p-4"><AnalyticsPage /></div>
+        <div className="py-6 max-w-7xl mx-auto px-4"><AnalyticsPage /></div>
       )}
 
       {activeTab === 'privacy' && (
-        <div className="p-4"><PrivacyCenterPage /></div>
+        <div className="py-6 max-w-7xl mx-auto px-4"><PrivacyCenterPage /></div>
       )}
 
       {activeTab === 'help' && (
-        <div className="p-4"><HelpPage /></div>
+        <div className="py-6 max-w-7xl mx-auto px-4"><HelpPage /></div>
       )}
 
-      {/* ── OVERVIEW HOME MODULE (default) ───────────────────────────────── */}
+      {/* ── OVERVIEW LANDING VIEW ────────────────────────────────────────── */}
       {activeTab === 'overview' && (
-        <>
-          {/* HERO */}
-          <section className="relative pt-12 pb-10 px-4 overflow-hidden">
-            <div className="absolute inset-0 pointer-events-none opacity-[0.04]"
-              style={{ backgroundImage: 'linear-gradient(rgba(75,65,225,0.8) 1px, transparent 1px), linear-gradient(90deg, rgba(75,65,225,0.8) 1px, transparent 1px)', backgroundSize: '48px 48px' }} />
-            <div className="absolute top-0 left-1/2 -translate-x-1/2 w-[700px] h-[350px] rounded-full opacity-10 blur-3xl pointer-events-none"
-              style={{ background: 'radial-gradient(ellipse, #4b41e1 0%, transparent 70%)' }} />
+        <main className="max-w-7xl mx-auto px-4 sm:px-6 py-10 space-y-10">
 
-            <div className="relative max-w-4xl mx-auto text-center space-y-4">
-              <div className="inline-flex items-center gap-2 px-3.5 py-1 rounded-full border text-xs font-bold"
-                style={{ background: 'rgba(75,65,225,0.1)', borderColor: 'rgba(75,65,225,0.35)', color: '#c3c0ff' }}>
-                <Radio className="w-3.5 h-3.5 animate-pulse" />
-                AI-Powered Civic Governance Operating System
-              </div>
+          {/* HERO SECTION */}
+          <section className="bg-white border border-gray-200 rounded-xl p-8 md:p-12 text-center space-y-6">
+            <span className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-blue-50 text-blue-700 text-xs font-semibold border border-blue-100">
+              AI-Powered Municipal Grievance Platform
+            </span>
 
-              <h1 className="text-3xl md:text-5xl font-black text-white leading-none tracking-tight"
-                style={{ fontFamily: 'Plus Jakarta Sans, Inter, sans-serif' }}>
-                Civic Pulse OS
-                <span className="block text-transparent bg-clip-text mt-2 text-2xl md:text-3xl"
-                  style={{ backgroundImage: 'linear-gradient(135deg, #c3c0ff, #4b41e1)' }}>
-                  Community Redressal Planner
-                </span>
-              </h1>
+            <h1 className="text-3xl md:text-5xl font-bold text-gray-900 tracking-tight max-w-3xl mx-auto leading-tight">
+              Community Redressal Planner
+            </h1>
 
-              <p className="text-xs md:text-sm leading-relaxed max-w-2xl mx-auto" style={{ color: '#909097' }}>
-                Multilingual · AI-Classified · Duplicate-Merged · SLA-Enforced · GIS-Mapped civic grievance intelligence.
-                All 10 modules accessible right here from a single URL.
-              </p>
+            <p className="text-base text-gray-600 max-w-2xl mx-auto leading-relaxed">
+              Accept grievances in text, voice, or images across 7 Indian languages.
+              AI automatically classifies issues, merges duplicates, predicts priorities, and enforces SLA timelines.
+            </p>
 
-              <div className="flex flex-wrap items-center justify-center gap-3 pt-2">
-                <button
-                  onClick={() => setActiveTab('new-complaint')}
-                  className="flex items-center gap-2 px-5 py-2.5 rounded-lg text-xs font-bold transition-all hover:brightness-110"
-                  style={{ background: 'linear-gradient(135deg,#4b41e1,#6352fa)', color: '#fff', boxShadow: '0 8px 24px rgba(75,65,225,0.35)' }}>
-                  <PlusCircle className="w-4 h-4" /> File New Grievance
-                </button>
-                <button
-                  onClick={() => setActiveTab('officer')}
-                  className="flex items-center gap-2 px-5 py-2.5 rounded-lg text-xs font-bold border transition-all"
-                  style={{ borderColor: '#45464d', color: '#bcc7de' }}>
-                  <Navigation className="w-4 h-4 text-emerald-400" /> Officer Queue
-                </button>
-                <button
-                  onClick={() => setActiveTab('executive')}
-                  className="flex items-center gap-2 px-5 py-2.5 rounded-lg text-xs font-bold border transition-all"
-                  style={{ borderColor: '#45464d', color: '#bcc7de' }}>
-                  <Award className="w-4 h-4 text-amber-400" /> Control Tower
-                </button>
-              </div>
+            <div className="flex flex-col sm:flex-row items-center justify-center gap-3 pt-2">
+              <button
+                onClick={() => setActiveTab('new-complaint')}
+                className="btn-primary text-base px-6 py-3"
+              >
+                <PlusCircle className="w-5 h-5" />
+                <span>Submit a Complaint</span>
+              </button>
+              <button
+                onClick={() => setActiveTab('map')}
+                className="btn-secondary text-base px-6 py-3"
+              >
+                <MapPin className="w-5 h-5 text-gray-500" />
+                <span>View Live GIS Map</span>
+              </button>
             </div>
           </section>
 
-          {/* STATS STRIP */}
-          <section className="max-w-7xl mx-auto px-4 sm:px-6 pb-8">
-            <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
-              {STATS.map((s, i) => {
-                const Icon = s.icon;
-                const colorMap: Record<string, { bg: string; txt: string; border: string }> = {
-                  cyan:    { bg: 'rgba(6,182,212,0.08)',   txt: '#22d3ee', border: 'rgba(6,182,212,0.2)'   },
-                  emerald: { bg: 'rgba(16,185,129,0.08)',  txt: '#34d399', border: 'rgba(16,185,129,0.2)'  },
-                  violet:  { bg: 'rgba(139,92,246,0.08)',  txt: '#a78bfa', border: 'rgba(139,92,246,0.2)'  },
-                  red:     { bg: 'rgba(239,68,68,0.08)',   txt: '#f87171', border: 'rgba(239,68,68,0.2)'   },
-                };
-                const c = colorMap[s.color];
-                return (
-                  <div key={i} className="rounded-xl p-4 space-y-2 border"
-                    style={{ background: '#1d2022', borderColor: '#272a2c' }}>
-                    <div className="w-8 h-8 rounded-lg flex items-center justify-center border"
-                      style={{ background: c.bg, borderColor: c.border }}>
-                      <Icon className="w-4 h-4" style={{ color: c.txt }} />
-                    </div>
-                    <div>
-                      <p className="text-xl font-black text-white tabular-nums">{s.value}</p>
-                      <p className="text-[11px]" style={{ color: '#909097' }}>{s.label}</p>
-                    </div>
-                    <p className="text-[10px] font-bold" style={{ color: '#c3c0ff' }}>{s.delta}</p>
+          {/* KEY METRICS */}
+          <section className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+            {METRICS.map((m, i) => {
+              const Icon = m.icon;
+              return (
+                <div key={i} className="card-flat p-5 space-y-2">
+                  <div className="flex items-center justify-between text-gray-500">
+                    <span className="text-xs font-semibold text-gray-500 uppercase tracking-wider">{m.label}</span>
+                    <Icon className="w-4 h-4 text-blue-600" />
                   </div>
-                );
-              })}
-            </div>
+                  <p className="text-2xl font-bold text-gray-900">{m.value}</p>
+                  <p className="text-xs font-medium text-gray-500">{m.change}</p>
+                </div>
+              );
+            })}
           </section>
 
-          {/* INTERACTIVE MODULE CAROUSEL & PREVIEWS */}
-          <section className="max-w-7xl mx-auto px-4 sm:px-6 pb-10">
-            <div className="mb-4">
-              <h2 className="text-lg font-black text-white" style={{ fontFamily: 'Plus Jakarta Sans, Inter, sans-serif' }}>
-                Instant Access Modules
-              </h2>
-              <p className="text-xs mt-1" style={{ color: '#909097' }}>
-                Click any screen thumbnail below to launch the live module instantly right on this URL
-              </p>
+          {/* PLATFORM SCREENSHOTS CAROUSEL */}
+          <section className="bg-white border border-gray-200 rounded-xl p-6 md:p-8 space-y-6">
+            <div>
+              <h2 className="text-xl font-bold text-gray-900">Platform Screens & Workflows</h2>
+              <p className="text-sm text-gray-500 mt-1">Select a screen preview to open the live interactive module</p>
             </div>
 
-            <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 items-start">
-              {/* Phone Frame */}
+            <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-center">
+              {/* Screen Display */}
               <div className="lg:col-span-5 flex justify-center">
-                <div className="relative w-[250px]">
-                  <div className="rounded-[36px] border-[8px] border-[#272a2c] bg-[#0b0f10] shadow-2xl overflow-hidden">
-                    <div className="h-6 bg-[#0b0f10] flex items-center justify-center">
-                      <div className="w-16 h-1.5 rounded-full bg-[#272a2c]" />
-                    </div>
-                    <div className="relative overflow-hidden" style={{ height: '460px' }}>
-                      <Image
-                        src={SCREENS[activeScreen].src}
-                        alt={SCREENS[activeScreen].label}
-                        fill
-                        className="object-cover object-top"
-                        priority
-                        sizes="250px"
-                        unoptimized
-                      />
-                    </div>
-                    <div className="h-5 bg-[#0b0f10] flex items-center justify-center">
-                      <div className="w-20 h-1 rounded-full bg-[#272a2c]" />
-                    </div>
+                <div className="w-[260px] border border-gray-300 rounded-2xl bg-white p-2 shadow-sm">
+                  <div className="relative rounded-xl overflow-hidden" style={{ height: '460px' }}>
+                    <Image
+                      src={SCREENS[activeScreen].src}
+                      alt={SCREENS[activeScreen].label}
+                      fill
+                      className="object-cover object-top"
+                      priority
+                      unoptimized
+                    />
                   </div>
                 </div>
               </div>
 
-              {/* Module Buttons */}
-              <div className="lg:col-span-7 space-y-4">
-                <div className="grid grid-cols-2 gap-3">
-                  {[
-                    { id: 'new-complaint', title: 'AI Intake Portal', desc: 'Voice, text, image, multi-language complaint submission', icon: PlusCircle },
-                    { id: 'citizen', title: 'Citizen Dashboard', desc: 'Track reports, view timelines & resolution proof', icon: Users },
-                    { id: 'officer', title: 'Officer Queue', desc: 'SLA priority list, location navigation & resolution upload', icon: Navigation },
-                    { id: 'executive', title: 'Commissioner Control', desc: 'City-wide SLA adherence, escalations & department KPIs', icon: Award },
-                    { id: 'admin', title: 'Super Admin', desc: 'AI review queue, category appeals & user RBAC management', icon: UserCheck },
-                    { id: 'map', title: 'GIS Heatmap', desc: 'Interactive map clusters, ward boundaries & officer tracking', icon: MapPin },
-                    { id: 'analytics', title: 'Analytics', desc: 'Hotspot analysis, trend graphs & PDF export reports', icon: BarChart2 },
-                    { id: 'privacy', title: 'Privacy Center', desc: 'DPDPA consent settings, PII redaction & audit logs', icon: Lock },
-                  ].map((m) => {
-                    const Icon = m.icon;
-                    return (
-                      <button
-                        key={m.id}
-                        onClick={() => setActiveTab(m.id as any)}
-                        className="p-3.5 rounded-xl border text-left transition-all group hover:-translate-y-0.5"
-                        style={{ background: '#1d2022', borderColor: '#272a2c' }}
-                      >
-                        <div className="flex items-center gap-2 mb-1.5">
-                          <Icon className="w-4 h-4 text-cyan-400 group-hover:text-white transition-colors" />
-                          <span className="text-xs font-bold text-white group-hover:text-cyan-400 transition-colors">{m.title}</span>
-                        </div>
-                        <p className="text-[10px] leading-relaxed" style={{ color: '#909097' }}>{m.desc}</p>
-                      </button>
-                    );
-                  })}
-                </div>
-              </div>
-            </div>
-          </section>
-
-          {/* LIVE FEED + AI PIPELINE */}
-          <section className="max-w-7xl mx-auto px-4 sm:px-6 pb-10">
-            <div className="grid grid-cols-1 lg:grid-cols-12 gap-6">
-
-              {/* Feed */}
-              <div className="lg:col-span-7 rounded-xl border p-5 space-y-4"
-                style={{ background: '#1d2022', borderColor: '#272a2c' }}>
-                <div className="flex items-center justify-between">
-                  <h2 className="text-xs font-extrabold text-white flex items-center gap-2">
-                    <Activity className="w-4 h-4 text-cyan-400" /> Live Complaint Feed
-                  </h2>
-                  <span className="px-2 py-0.5 text-[9px] font-mono font-bold rounded border"
-                    style={{ background: 'rgba(6,182,212,0.1)', color: '#22d3ee', borderColor: 'rgba(6,182,212,0.25)' }}>
-                    REAL-TIME
-                  </span>
-                </div>
-
-                <div className="space-y-2">
-                  {LIVE_COMPLAINTS.map((c, i) => (
-                    <button key={c.id} onClick={() => setActiveFeed(i)}
-                      className="w-full p-3 rounded-xl border text-left transition-all"
-                      style={{
-                        background: activeFeed === i ? '#272a2c' : '#191c1e',
-                        borderColor: activeFeed === i ? '#4b41e1' : '#272a2c',
-                      }}>
-                      <div className="flex items-start justify-between gap-3">
-                        <div className="flex-1 min-w-0">
-                          <div className="flex items-center gap-2 mb-1">
-                            <span className={`w-2 h-2 rounded-full flex-shrink-0 ${PRIORITY_DOT[c.priority]}`} />
-                            <span className="font-mono text-[10px] font-bold tabular-nums" style={{ color: '#909097' }}>#{c.id}</span>
-                            <span className="px-1.5 py-0.5 rounded text-[9px] font-bold border"
-                              style={{ background: '#272a2c', color: '#bcc7de', borderColor: '#45464d' }}>
-                              {c.category.replace('_', ' ')}
-                            </span>
-                          </div>
-                          <p className="text-[11px] flex items-center gap-1" style={{ color: '#909097' }}>
-                            <MapPin className="w-3 h-3 flex-shrink-0" style={{ color: '#45464d' }} /> {c.ward}
-                          </p>
-                        </div>
-                        <div className="flex flex-col items-end gap-1 flex-shrink-0">
-                          <span className={`px-2 py-0.5 rounded-full text-[9px] font-bold border ${STATUS_PILL[c.status]}`}>
-                            {c.status.replace('_', ' ')}
-                          </span>
-                          <span className="text-[10px] font-mono font-bold tabular-nums" style={{ color: '#c3c0ff' }}>
-                            {c.ai}% Conf.
-                          </span>
-                        </div>
-                      </div>
-                      {activeFeed === i && (
-                        <div className="mt-2">
-                          <Bar pct={c.ai} active />
-                        </div>
-                      )}
-                    </button>
-                  ))}
-                </div>
-              </div>
-
-              {/* Models */}
-              <div className="lg:col-span-5 rounded-xl border p-5 space-y-3"
-                style={{ background: '#1d2022', borderColor: '#272a2c' }}>
-                <div className="flex items-center justify-between">
-                  <h2 className="text-xs font-extrabold text-white flex items-center gap-2">
-                    <Cpu className="w-4 h-4 text-cyan-400" /> AI Inference Models
-                  </h2>
-                  <span className="px-2 py-0.5 text-[9px] font-mono font-bold rounded border"
-                    style={{ background: 'rgba(99,86,251,0.1)', color: '#c3c0ff', borderColor: 'rgba(99,86,251,0.3)' }}>
-                    ACTIVE
-                  </span>
-                </div>
-
-                <div className="space-y-2">
-                  {AI_MODELS.map((m, i) => (
-                    <div key={i} className="p-2.5 rounded-xl border space-y-1.5"
-                      style={{ background: '#191c1e', borderColor: '#272a2c' }}>
-                      <div className="flex items-center justify-between text-xs">
-                        <span className="font-bold text-white">{m.name}</span>
-                        <span className="text-[10px] font-mono text-cyan-400">{m.pct}%</span>
-                      </div>
-                      <Bar pct={m.pct} />
+              {/* Selector List */}
+              <div className="lg:col-span-7 space-y-3">
+                {SCREENS.map((s, i) => (
+                  <button
+                    key={i}
+                    onClick={() => {
+                      setActiveScreen(i);
+                      setActiveTab(s.tabId as any);
+                    }}
+                    className={`w-full p-4 rounded-xl border text-left transition-all flex items-start gap-4 ${
+                      activeScreen === i
+                        ? 'border-blue-500 bg-blue-50/50'
+                        : 'border-gray-200 bg-white hover:border-gray-300'
+                    }`}
+                  >
+                    <div className="w-8 h-8 rounded-lg bg-blue-100 text-blue-700 flex items-center justify-center font-bold text-sm shrink-0">
+                      {i + 1}
                     </div>
-                  ))}
-                </div>
+                    <div className="flex-1">
+                      <div className="flex items-center justify-between">
+                        <h3 className="font-semibold text-gray-900 text-sm">{s.label}</h3>
+                        <span className="text-xs font-semibold text-blue-600 flex items-center gap-1">
+                          Open <ChevronRight className="w-3.5 h-3.5" />
+                        </span>
+                      </div>
+                      <p className="text-xs text-gray-500 mt-1">{s.desc}</p>
+                    </div>
+                  </button>
+                ))}
               </div>
             </div>
           </section>
-        </>
+
+          {/* LIVE COMPLAINT FEED */}
+          <section className="bg-white border border-gray-200 rounded-xl p-6 md:p-8 space-y-4">
+            <div className="flex items-center justify-between border-b border-gray-100 pb-4">
+              <div>
+                <h2 className="text-lg font-bold text-gray-900">Recent Incident Feed</h2>
+                <p className="text-xs text-gray-500">Real-time reports processed by AI classification</p>
+              </div>
+              <button
+                onClick={() => setActiveTab('officer')}
+                className="text-xs font-semibold text-blue-600 hover:underline flex items-center gap-1"
+              >
+                View Officer Queue <ChevronRight className="w-3.5 h-3.5" />
+              </button>
+            </div>
+
+            <div className="divide-y divide-gray-100">
+              {MOCK_FEED.map((item) => (
+                <div key={item.id} className="py-3.5 flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+                  <div className="space-y-1">
+                    <div className="flex items-center gap-2">
+                      <span className="font-mono text-xs font-bold text-gray-900">{item.id}</span>
+                      <span className="text-xs font-medium text-gray-700 bg-gray-100 px-2 py-0.5 rounded">
+                        {item.category}
+                      </span>
+                      <span className={`pill ${
+                        item.status === 'RESOLVED' ? 'pill-resolved' :
+                        item.status === 'IN_PROGRESS' ? 'pill-progress' : 'pill-assigned'
+                      }`}>
+                        {item.status.replace('_', ' ')}
+                      </span>
+                    </div>
+                    <p className="text-xs text-gray-500 flex items-center gap-1">
+                      <MapPin className="w-3 h-3 text-gray-400" /> {item.location}
+                    </p>
+                  </div>
+
+                  <div className="flex items-center gap-4 text-xs font-medium">
+                    <span className="text-gray-500">
+                      Priority: <strong className="text-gray-900">{item.priority}</strong>
+                    </span>
+                    <span className="text-gray-500">
+                      SLA: <strong className="text-blue-600">{item.sla}</strong>
+                    </span>
+                    <span className="text-xs font-semibold text-emerald-700 bg-emerald-50 px-2 py-1 rounded border border-emerald-200">
+                      {item.confidence}% AI Confidence
+                    </span>
+                  </div>
+                </div>
+              ))}
+            </div>
+          </section>
+
+        </main>
       )}
 
       {/* ── FOOTER ─────────────────────────────────────────────────────────── */}
-      <footer className="border-t mt-auto" style={{ borderColor: '#272a2c', background: '#101415' }}>
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 py-6 flex flex-col md:flex-row items-center justify-between gap-4">
+      <footer className="bg-white border-t border-gray-200 mt-16 py-8">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 flex flex-col sm:flex-row items-center justify-between gap-4 text-xs text-gray-500">
           <div className="flex items-center gap-2">
-            <div className="w-6 h-6 rounded-lg bg-gradient-to-tr from-violet-600 to-indigo-500 flex items-center justify-center">
-              <Zap className="w-3.5 h-3.5 text-white" />
-            </div>
-            <span className="text-xs font-bold" style={{ color: '#bcc7de' }}>Civic Pulse OS · Community Redressal Planner</span>
+            <ShieldCheck className="w-4 h-4 text-blue-600" />
+            <span className="font-semibold text-gray-700">Community Redressal Planner</span>
+            <span>— AI Civic Operating System</span>
           </div>
-          <div className="flex items-center gap-2 text-[11px]" style={{ color: '#45464d' }}>
-            <Leaf className="w-3 h-3 text-emerald-400" />
-            <span>Single-URL Multi-Module Platform · Swachh Bharat & DPDPA Compliant</span>
+          <div className="flex items-center gap-4">
+            <button onClick={() => setActiveTab('privacy')} className="hover:text-gray-900 transition-colors">Privacy Center</button>
+            <button onClick={() => setActiveTab('help')} className="hover:text-gray-900 transition-colors">Help Center</button>
+            <a href="http://localhost:3001/complaints/open-data" target="_blank" rel="noreferrer" className="hover:text-gray-900 transition-colors">Open Data API</a>
           </div>
         </div>
       </footer>
