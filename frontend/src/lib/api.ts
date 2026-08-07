@@ -1,9 +1,17 @@
 import axios from 'axios';
 
-const API_BASE = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3001';
+const getApiBaseUrl = () => {
+  if (process.env.NEXT_PUBLIC_API_URL) {
+    return process.env.NEXT_PUBLIC_API_URL;
+  }
+  if (typeof window !== 'undefined') {
+    return window.location.origin;
+  }
+  return 'http://localhost:3001';
+};
 
 export const api = axios.create({
-  baseURL: API_BASE,
+  baseURL: getApiBaseUrl(),
   withCredentials: true,
   headers: {
     'Content-Type': 'application/json',
@@ -29,7 +37,7 @@ api.interceptors.response.use(
       try {
         const refreshToken = localStorage.getItem('refreshToken');
         if (refreshToken) {
-          const res = await axios.post(`${API_BASE}/auth/refresh`, { refreshToken });
+          const res = await axios.post(`${getApiBaseUrl()}/auth/refresh`, { refreshToken });
           const newAccessToken = res.data.accessToken;
           const newRefreshToken = res.data.refreshToken;
 
