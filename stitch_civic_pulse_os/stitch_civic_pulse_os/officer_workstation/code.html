@@ -1,0 +1,352 @@
+<!DOCTYPE html><html class="light" lang="en"><head>
+<meta charset="utf-8">
+<meta content="width=device-width, initial-scale=1.0" name="viewport">
+<title>Civic Planner - Field Officer Workstation</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600&amp;family=Plus+Jakarta+Sans:wght@600;700;800&amp;display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet">
+<script id="tailwind-config">
+      tailwind.config = {
+        darkMode: "class",
+        theme: {
+          extend: {
+            "colors": {
+                    "tertiary-fixed-dim": "#bcc7de",
+                    "on-primary-fixed-variant": "#3f465c",
+                    "on-secondary-fixed": "#0f0069",
+                    "on-secondary-container": "#fffbff",
+                    "primary-fixed": "#dae2fd",
+                    "surface-container-highest": "#e0e3e5",
+                    "surface": "#f7f9fb",
+                    "primary-container": "#131b2e",
+                    "on-tertiary-fixed": "#111c2d",
+                    "on-surface": "#191c1e",
+                    "on-primary-container": "#7c839b",
+                    "surface-container-low": "#f2f4f6",
+                    "error": "#ba1a1a",
+                    "on-error": "#ffffff",
+                    "primary-fixed-dim": "#bec6e0",
+                    "on-error-container": "#93000a",
+                    "surface-container": "#eceef0",
+                    "secondary": "#4b41e1",
+                    "surface-container-high": "#e6e8ea",
+                    "error-container": "#ffdad6",
+                    "surface-tint": "#565e74",
+                    "primary": "#000000",
+                    "on-surface-variant": "#45464d",
+                    "on-background": "#191c1e",
+                    "on-tertiary": "#ffffff",
+                    "inverse-on-surface": "#eff1f3",
+                    "on-primary": "#ffffff",
+                    "tertiary-fixed": "#d8e3fb",
+                    "outline": "#76777d",
+                    "background": "#f7f9fb",
+                    "tertiary-container": "#111c2d",
+                    "on-tertiary-container": "#79849a",
+                    "secondary-fixed-dim": "#c3c0ff",
+                    "surface-container-lowest": "#ffffff",
+                    "surface-dim": "#d8dadc",
+                    "on-primary-fixed": "#131b2e",
+                    "surface-variant": "#e0e3e5",
+                    "on-secondary-fixed-variant": "#3323cc",
+                    "inverse-surface": "#2d3133",
+                    "tertiary": "#000000",
+                    "on-tertiary-fixed-variant": "#3c475a",
+                    "secondary-container": "#645efb",
+                    "secondary-fixed": "#e2dfff",
+                    "surface-bright": "#f7f9fb",
+                    "on-secondary": "#ffffff",
+                    "inverse-primary": "#bec6e0",
+                    "outline-variant": "#c6c6cd"
+            },
+            "borderRadius": {
+                    "DEFAULT": "0.25rem",
+                    "lg": "0.5rem",
+                    "xl": "0.75rem",
+                    "full": "9999px"
+            },
+            "spacing": {
+                    "base": "4px",
+                    "container-max": "1280px",
+                    "gutter": "24px",
+                    "margin-mobile": "16px",
+                    "stack-sm": "8px",
+                    "stack-lg": "32px",
+                    "stack-md": "16px",
+                    "margin-desktop": "48px"
+            },
+            "fontFamily": {
+                    "body-md": ["Inter"],
+                    "body-lg": ["Inter"],
+                    "headline-lg": ["Plus Jakarta Sans"],
+                    "headline-lg-mobile": ["Plus Jakarta Sans"],
+                    "tabular-nums": ["Inter"],
+                    "display": ["Plus Jakarta Sans"],
+                    "label-md": ["Inter"],
+                    "headline-md": ["Plus Jakarta Sans"]
+            },
+            "fontSize": {
+                    "body-md": ["16px", {"lineHeight": "24px", "fontWeight": "400"}],
+                    "body-lg": ["18px", {"lineHeight": "28px", "fontWeight": "400"}],
+                    "headline-lg": ["32px", {"lineHeight": "40px", "letterSpacing": "-0.01em", "fontWeight": "700"}],
+                    "headline-lg-mobile": ["24px", {"lineHeight": "32px", "fontWeight": "700"}],
+                    "tabular-nums": ["inherit", {"fontWeight": "inherit"}],
+                    "display": ["48px", {"lineHeight": "1.1", "letterSpacing": "-0.02em", "fontWeight": "800"}],
+                    "label-md": ["14px", {"lineHeight": "20px", "letterSpacing": "0.05em", "fontWeight": "600"}],
+                    "headline-md": ["24px", {"lineHeight": "32px", "fontWeight": "600"}]
+            }
+          },
+        },
+      }
+    </script>
+<style>
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+        }
+        .material-symbols-outlined.fill {
+            font-variation-settings: 'FILL' 1;
+        }
+        /* Hide scrollbar for clean UI */
+        ::-webkit-scrollbar { width: 6px; height: 6px; }
+        ::-webkit-scrollbar-track { background: transparent; }
+        ::-webkit-scrollbar-thumb { background: #e0e3e5; border-radius: 4px; }
+        ::-webkit-scrollbar-thumb:hover { background: #c6c6cd; }
+    </style>
+</head>
+<body class="bg-background text-on-background font-body-md min-h-screen flex flex-col">
+<!-- TopAppBar -->
+<header class="bg-surface/80 dark:bg-inverse-surface/80 backdrop-blur-xl border-b border-outline-variant/30 shadow-sm docked full-width top-0 sticky flex justify-between items-center w-full px-margin-mobile md:px-margin-desktop py-stack-md z-50">
+<div class="flex items-center gap-4">
+<div class="w-10 h-10 rounded-full overflow-hidden border border-outline-variant/30 shrink-0">
+<img class="w-full h-full object-cover" data-alt="A macro close-up of an official urban city crest or badge, embossed on matte silver metal with deep navy blue enamel accents. The lighting is sharp studio lighting highlighting the metallic textures, set against a very clean light grey surface. The style is modern institutional photography." src="https://lh3.googleusercontent.com/aida-public/AB6AXuDNHvHtsFe3Y_N2WKsMBgmAQ_j5i1l-vW5MX0glWnYHEXB1wVvQ375hdNDRxptkhb5fR_yU28DX-4W7R_-WAhnjYyS6cJbcepTIJZ1vmiyuYp5iuDGzcyeSaeUgF5S_V_oB88xyofaRZMhK3m0-xhKmDjGxvGbxO-A5wR3YB_si0FuMsygDWet4rr9bKXmklAyStrrakqptaGmWhUacvwmXI5Wz1PtvFfioS2dI6HtyZpGxvj5N6JYS2g">
+</div>
+<h1 class="font-headline-md text-headline-md font-bold text-primary dark:text-inverse-primary">Civic Planner</h1>
+</div>
+<!-- Desktop Nav -->
+<nav class="hidden md:flex gap-8">
+<a class="text-on-surface-variant dark:text-surface-variant hover:bg-surface-container-high/50 dark:hover:bg-surface-variant/30 transition-colors font-label-md text-label-md px-3 py-2 rounded-lg flex items-center gap-2" href="#">
+<span class="material-symbols-outlined">dashboard</span>
+                Dashboard
+            </a>
+<a class="text-secondary dark:text-secondary-fixed font-bold hover:bg-surface-container-high/50 dark:hover:bg-surface-variant/30 transition-colors font-label-md text-label-md px-3 py-2 rounded-lg flex items-center gap-2" href="#">
+<span class="material-symbols-outlined fill">list_alt</span>
+                Priority Queue
+            </a>
+<a class="text-on-surface-variant dark:text-surface-variant hover:bg-surface-container-high/50 dark:hover:bg-surface-variant/30 transition-colors font-label-md text-label-md px-3 py-2 rounded-lg flex items-center gap-2" href="#">
+<span class="material-symbols-outlined">map</span>
+                Map
+            </a>
+<a class="text-on-surface-variant dark:text-surface-variant hover:bg-surface-container-high/50 dark:hover:bg-surface-variant/30 transition-colors font-label-md text-label-md px-3 py-2 rounded-lg flex items-center gap-2" href="#">
+<span class="material-symbols-outlined">account_circle</span>
+                Profile
+            </a>
+</nav>
+<button class="bg-error-container text-on-error-container font-label-md text-label-md px-4 py-2 rounded-lg hover:bg-error hover:text-on-error transition-colors flex items-center gap-2">
+<span class="material-symbols-outlined">warning</span>
+            SOS 112
+        </button>
+</header>
+<!-- Main Workspace -->
+<main class="flex-1 flex flex-col md:flex-row w-full max-w-container-max mx-auto md:px-margin-desktop px-margin-mobile py-stack-lg gap-gutter h-[calc(100vh-80px)] overflow-hidden">
+<!-- Left Panel: Priority Queue -->
+<section class="w-full md:w-[400px] flex flex-col h-full bg-surface-container-lowest rounded-xl border border-outline-variant/30 shadow-[0_4px_6px_-1px_rgb(0_0_0/0.1)] shrink-0 overflow-hidden">
+<div class="p-4 border-b border-outline-variant/30 bg-surface/50 backdrop-blur-sm z-10">
+<h2 class="font-headline-md text-headline-md-mobile text-on-surface mb-4">SLA Priority Queue</h2>
+<!-- Filters -->
+<div class="flex gap-2 overflow-x-auto pb-2 scrollbar-hide">
+<button class="bg-secondary text-on-secondary font-label-md text-label-md px-3 py-1.5 rounded-full shrink-0 border border-transparent">
+                        All Urgent
+                    </button>
+<button class="bg-surface-container text-on-surface-variant hover:bg-surface-container-high font-label-md text-label-md px-3 py-1.5 rounded-full shrink-0 border border-outline-variant/50 transition-colors">
+                        Critical (SLA &lt; 2h)
+                    </button>
+<button class="bg-surface-container text-on-surface-variant hover:bg-surface-container-high font-label-md text-label-md px-3 py-1.5 rounded-full shrink-0 border border-outline-variant/50 transition-colors">
+                        High (SLA &lt; 12h)
+                    </button>
+</div>
+</div>
+<!-- Queue List -->
+<div class="flex-1 overflow-y-auto p-4 space-y-4">
+<!-- Active Card -->
+<div class="bg-primary-fixed text-on-primary-fixed border-2 border-secondary rounded-lg p-4 cursor-pointer hover:shadow-md transition-all">
+<div class="flex justify-between items-start mb-2">
+<span class="bg-error/20 text-error font-label-md text-label-md px-2 py-1 rounded-full flex items-center gap-1 text-[12px]">
+<span class="material-symbols-outlined text-[14px]">timer</span>
+                            01:45:00
+                        </span>
+<span class="font-tabular-nums text-on-primary-fixed-variant text-sm font-semibold">0.8km away</span>
+</div>
+<h3 class="font-headline-lg-mobile text-headline-lg-mobile text-on-primary-fixed mb-1">Pothole Repair - Arterial</h3>
+<p class="text-body-md text-on-primary-fixed-variant mb-3 line-clamp-2">Deep structural damage on main arterial route causing severe traffic disruption. Immediate fill required.</p>
+<div class="flex items-center gap-4 text-sm">
+<div class="flex items-center gap-1 text-secondary">
+<span class="material-symbols-outlined text-[18px]">verified</span>
+<span class="font-semibold">98% Confidence</span>
+</div>
+<div class="flex items-center gap-1 text-on-primary-fixed-variant">
+<span class="material-symbols-outlined text-[18px]">map</span>
+                            Ward 4
+                        </div>
+</div>
+</div>
+<!-- Card 2 -->
+<div class="bg-surface-container-lowest border border-outline-variant/50 rounded-lg p-4 cursor-pointer hover:border-secondary hover:shadow-[0_4px_6px_-1px_rgb(0_0_0/0.1)] transition-all">
+<div class="flex justify-between items-start mb-2">
+<span class="bg-secondary-container/30 text-secondary font-label-md text-label-md px-2 py-1 rounded-full flex items-center gap-1 text-[12px]">
+<span class="material-symbols-outlined text-[14px]">timer</span>
+                            08:30:00
+                        </span>
+<span class="font-tabular-nums text-on-surface-variant text-sm">2.4km away</span>
+</div>
+<h3 class="font-headline-lg-mobile text-headline-lg-mobile text-on-surface mb-1">Fallen Tree - Pedestrian Path</h3>
+<p class="text-body-md text-on-surface-variant mb-3 line-clamp-2">Large oak branch blocking pedestrian walkway in central park. Requires chainsaw clearing.</p>
+<div class="flex items-center gap-4 text-sm">
+<div class="flex items-center gap-1 text-on-surface-variant">
+<span class="material-symbols-outlined text-[18px]">verified</span>
+<span>85% Confidence</span>
+</div>
+<div class="flex items-center gap-1 text-on-surface-variant">
+<span class="material-symbols-outlined text-[18px]">map</span>
+                            Ward 2
+                        </div>
+</div>
+</div>
+<!-- Card 3 -->
+<div class="bg-surface-container-lowest border border-outline-variant/50 rounded-lg p-4 cursor-pointer hover:border-secondary hover:shadow-[0_4px_6px_-1px_rgb(0_0_0/0.1)] transition-all">
+<div class="flex justify-between items-start mb-2">
+<span class="bg-secondary-container/30 text-secondary font-label-md text-label-md px-2 py-1 rounded-full flex items-center gap-1 text-[12px]">
+<span class="material-symbols-outlined text-[14px]">timer</span>
+                            11:15:00
+                        </span>
+<span class="font-tabular-nums text-on-surface-variant text-sm">3.1km away</span>
+</div>
+<h3 class="font-headline-lg-mobile text-headline-lg-mobile text-on-surface mb-1">Streetlight Outage</h3>
+<p class="text-body-md text-on-surface-variant mb-3 line-clamp-2">Multiple lights out on Elm street intersection. Suspected junction box failure.</p>
+<div class="flex items-center gap-4 text-sm">
+<div class="flex items-center gap-1 text-on-surface-variant">
+<span class="material-symbols-outlined text-[18px]">verified</span>
+<span>92% Confidence</span>
+</div>
+<div class="flex items-center gap-1 text-on-surface-variant">
+<span class="material-symbols-outlined text-[18px]">map</span>
+                            Ward 7
+                        </div>
+</div>
+</div>
+</div>
+</section>
+<!-- Right Panel: Detail View & Action Panel -->
+<section class="flex-1 flex flex-col h-full bg-surface-container-lowest rounded-xl border border-outline-variant/30 shadow-[0_4px_6px_-1px_rgb(0_0_0/0.1)] overflow-hidden">
+<!-- Header Status -->
+<div class="p-6 border-b border-outline-variant/30 bg-surface/50 backdrop-blur-sm flex justify-between items-center z-10">
+<div>
+<h2 class="font-headline-lg text-headline-lg text-on-surface mb-1">Pothole Repair - Arterial</h2>
+<div class="flex gap-3 text-on-surface-variant font-label-md text-label-md">
+<span>Ticket #CR-2023-8842</span>
+<span>•</span>
+<span>Ward 4</span>
+<span>•</span>
+<span>Reported by Citizen App</span>
+</div>
+</div>
+<div class="flex flex-col items-end">
+<span class="text-on-surface-variant text-sm mb-1">SLA Deadline</span>
+<div class="bg-error/10 border border-error/30 text-error font-tabular-nums text-2xl font-bold px-4 py-2 rounded-lg flex items-center gap-2">
+<span class="material-symbols-outlined">alarm</span>
+                        01:44:59
+                    </div>
+</div>
+</div>
+<div class="flex-1 overflow-y-auto p-6 grid grid-cols-1 lg:grid-cols-2 gap-6">
+<!-- Media & Map -->
+<div class="space-y-6">
+<!-- Before Photo -->
+<div class="rounded-xl border border-outline-variant/30 overflow-hidden bg-surface-container-low">
+<div class="p-3 border-b border-outline-variant/30 bg-surface-container flex items-center justify-between">
+<span class="font-label-md text-label-md text-on-surface flex items-center gap-2">
+<span class="material-symbols-outlined text-[18px]">photo_camera</span>
+                                "Before" Evidence
+                            </span>
+<span class="text-xs text-on-surface-variant">Uploaded 2hrs ago</span>
+</div>
+<div class="aspect-video relative">
+<img class="w-full h-full object-cover" data-alt="A photograph showing a large, deep pothole in the middle of a cracked asphalt road. The edges of the pothole are jagged. There is a yellow traffic cone slightly blurred in the background. The lighting is overcast daylight. Professional documentary style, high resolution." src="https://lh3.googleusercontent.com/aida-public/AB6AXuBCzIlXP5F3hvEGWz8kJ8JfXDFGqwAA0341MhD002gRLnHycEAi7IqBt4aPDgG1Vd2w3xu_ekCyw9WUNtRGH6tglWfFPL3oQm-wEmNqT1fuLoenjkQNBNeh3SPtZCZHxClr1lEJTH7Ku0fFL4X3ulKhhI59KzFeZoScKKyCPkUV3LMHRqePXQ5_nFVlT4IdARoiNVYPerFNX6DC1ndlz7auLA9tczYZ4UdFwMCkT38Md1JTMvjIEbUN1A">
+<div class="absolute bottom-2 right-2 bg-surface/80 backdrop-blur-md px-2 py-1 rounded text-xs font-tabular-nums border border-outline-variant/50">
+                                AI Analysis: Severe Structural Damage
+                             </div>
+</div>
+</div>
+<!-- Map Preview -->
+<div class="rounded-xl border border-outline-variant/30 overflow-hidden bg-surface-container-low h-64 relative">
+<!-- Map Placeholder Background -->
+<div class="w-full h-full bg-cover bg-center" data-alt="A clean, minimalist digital map interface showing city streets in light mode. The map features soft light grey roads on an off-white background with subtle light blue highlights for water bodies. A distinct red pin marker indicates a location, and a translucent red circular zone surrounds it. UI elements are overlaid." data-location="Chicago" style="background-image: url('https://lh3.googleusercontent.com/aida-public/AB6AXuBSLJanZpLdWb49FFPJ7Qya4NjuIPet8oN5KEZLRLszxxJFosgCoRb-9lR1YAQxnlEnhW3BbJPovKk2UBBxkh7fPvT3skeBjfwrbBad5zqcDoL5N290NLltnwshbn1GdzL8izho1U0y70K7tlQoAWOf2mHflqokrxUdwQ4Elph-UIAvfW-iFrAL1iboeIUOXx4NBp9PgGHO668CPs4WBaQkn2HEOLuWffU6GSYZKGFg-PHNBii94C04vw')"></div>
+<div class="absolute top-3 left-3 bg-surface/90 backdrop-blur-md p-2 rounded-lg border border-outline-variant/50 shadow-sm">
+<span class="block font-label-md text-label-md text-on-surface">Location</span>
+<span class="text-sm text-on-surface-variant">41.8781° N, 87.6298° W</span>
+</div>
+</div>
+</div>
+<!-- Actions & Notes -->
+<div class="flex flex-col gap-6">
+<!-- Action Panel -->
+<div class="bg-surface border border-outline-variant/30 rounded-xl p-6 flex flex-col gap-4">
+<h3 class="font-headline-md text-headline-md-mobile text-on-surface">Resolution Actions</h3>
+<div class="grid grid-cols-2 gap-4 mb-2">
+<button class="bg-primary-container text-on-primary-container font-label-md text-label-md py-3 rounded-lg hover:bg-primary-container/90 transition-colors flex justify-center items-center gap-2">
+<span class="material-symbols-outlined">directions_car</span>
+                                En Route
+                            </button>
+<button class="bg-surface-container-lowest border border-secondary text-secondary font-label-md text-label-md py-3 rounded-lg hover:bg-secondary/5 transition-colors flex justify-center items-center gap-2">
+<span class="material-symbols-outlined">swap_horiz</span>
+                                Re-route
+                            </button>
+</div>
+<div class="border-t border-outline-variant/30 pt-4">
+<label class="block font-label-md text-label-md text-on-surface mb-2">Mark as Resolved</label>
+<div class="border-2 border-dashed border-outline-variant/50 rounded-lg p-6 text-center hover:border-secondary hover:bg-secondary/5 transition-colors cursor-pointer mb-4">
+<span class="material-symbols-outlined text-3xl text-secondary mb-2 block">add_a_photo</span>
+<span class="block font-label-md text-label-md text-on-surface">Upload Resolution Photo</span>
+<span class="text-xs text-on-surface-variant">* Mandatory for status change</span>
+</div>
+<button class="w-full bg-secondary/50 text-on-secondary/50 font-label-md text-label-md py-3 rounded-lg cursor-not-allowed flex justify-center items-center gap-2">
+<span class="material-symbols-outlined">check_circle</span>
+                                Complete Task
+                            </button>
+</div>
+</div>
+<!-- Private Notes -->
+<div class="flex-1 bg-surface-container-lowest border border-outline-variant/30 rounded-xl p-6 flex flex-col">
+<div class="flex justify-between items-center mb-4">
+<h3 class="font-headline-md text-headline-md-mobile text-on-surface flex items-center gap-2">
+<span class="material-symbols-outlined">edit_note</span>
+                                Officer Notes
+                            </h3>
+<span class="text-xs text-on-surface-variant bg-surface-container-high px-2 py-1 rounded">Private</span>
+</div>
+<textarea class="flex-1 w-full border border-outline-variant/50 rounded-lg p-3 bg-surface text-body-md text-on-surface focus:ring-2 focus:ring-secondary focus:border-secondary resize-none" placeholder="Add field observations, material requirements, or follow-up notes here..."></textarea>
+</div>
+</div>
+</div>
+</section>
+</main>
+<!-- BottomNavBar (Mobile Only) -->
+<nav class="md:hidden bg-surface/80 dark:bg-inverse-surface/80 backdrop-blur-xl border-t border-outline-variant/30 shadow-lg docked full-width bottom-0 rounded-t-xl fixed left-0 w-full z-50 flex justify-around items-center px-4 py-2">
+<a class="flex flex-col items-center justify-center text-on-surface-variant dark:text-surface-variant px-4 py-1 hover:text-secondary transition-colors" href="#">
+<span class="material-symbols-outlined">dashboard</span>
+<span class="font-label-md text-[10px] mt-1">Dashboard</span>
+</a>
+<a class="flex flex-col items-center justify-center bg-secondary-container dark:bg-secondary text-on-secondary-container dark:text-on-secondary rounded-xl px-4 py-1 scale-90 duration-150 ease-in-out" href="#">
+<span class="material-symbols-outlined fill">list_alt</span>
+<span class="font-label-md text-[10px] mt-1">Queue</span>
+</a>
+<a class="flex flex-col items-center justify-center text-on-surface-variant dark:text-surface-variant px-4 py-1 hover:text-secondary transition-colors" href="#">
+<span class="material-symbols-outlined">map</span>
+<span class="font-label-md text-[10px] mt-1">Map</span>
+</a>
+<a class="flex flex-col items-center justify-center text-on-surface-variant dark:text-surface-variant px-4 py-1 hover:text-secondary transition-colors" href="#">
+<span class="material-symbols-outlined">account_circle</span>
+<span class="font-label-md text-[10px] mt-1">Profile</span>
+</a>
+</nav>
+</body></html>
