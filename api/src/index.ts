@@ -3,6 +3,11 @@ import cors from 'cors';
 import helmet from 'helmet';
 import { config } from './config';
 import { authRouter } from './auth/auth.controller';
+import { complaintRouter } from './complaints/complaint.controller';
+import { webhooksRouter } from './webhooks/webhooks.controller';
+import { gisRouter } from './gis/gis.controller';
+import { dashboardRouter } from './dashboards/dashboard.controller';
+import { analyticsRouter } from './analytics/analytics.controller';
 
 const app = express();
 
@@ -20,8 +25,13 @@ app.get('/health', (req: Request, res: Response) => {
   });
 });
 
-// Routes
+// API Routes
 app.use('/auth', authRouter);
+app.use('/complaints', complaintRouter);
+app.use('/webhooks', webhooksRouter);
+app.use('/gis', gisRouter);
+app.use('/dashboard', dashboardRouter);
+app.use('/analytics', analyticsRouter);
 
 // Start server
 if (process.env.NODE_ENV !== 'test') {
