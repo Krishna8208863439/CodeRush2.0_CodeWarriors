@@ -446,7 +446,7 @@
       "user_id": "bafb93c7-8da1-40ba-b7f5-3ed1986d25a2",
       "token_hash": "720fed67c9281c0b2192aecf7b97f4492dc3b3e15e96e1f734397efafbd1f1a9",
       "expires_at": "2026-08-14T15:44:26.000Z",
-      "revoked": false,
+      "revoked": true,
       "created_at": "2026-08-07T15:44:26.001Z"
     },
     {
@@ -480,6 +480,22 @@
       "expires_at": "2026-08-14T15:52:26.122Z",
       "revoked": false,
       "created_at": "2026-08-07T15:52:26.124Z"
+    },
+    {
+      "id": "9978d01f-1212-4ed5-b965-a90f314ee333",
+      "user_id": "bafb93c7-8da1-40ba-b7f5-3ed1986d25a2",
+      "token_hash": "e9051d0b3436232861e2d8ddcfd73a40268940c5f79a1effc1d6096ce4c9757c",
+      "expires_at": "2026-08-14T16:00:56.315Z",
+      "revoked": true,
+      "created_at": "2026-08-07T16:00:56.318Z"
+    },
+    {
+      "id": "343ee517-4119-4abc-899c-3b1edcb5f8b7",
+      "user_id": "bafb93c7-8da1-40ba-b7f5-3ed1986d25a2",
+      "token_hash": "e7eb795abb3f4ccd7c6dd37250196c44fb1713955950ade7e433984e5f1c1957",
+      "expires_at": "2026-08-14T16:31:29.599Z",
+      "revoked": false,
+      "created_at": "2026-08-07T16:31:29.609Z"
     }
   ],
   "password_reset_tokens": [
