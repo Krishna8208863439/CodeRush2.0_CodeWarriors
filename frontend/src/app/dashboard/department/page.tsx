@@ -60,7 +60,7 @@ export default function DepartmentDashboard() {
   const { department, complaints, officers } = data || { complaints: [], officers: [] };
 
   return (
-    <div className="min-h-screen bg-slate-950 text-slate-100 p-6 max-w-7xl mx-auto space-y-8">
+    <div className="bg-slate-950 text-slate-100 p-6 rounded-xl w-full mx-auto space-y-6">
       <div className="flex flex-col md:flex-row items-start md:items-center justify-between gap-4 border-b border-slate-800 pb-6">
         <div className="flex items-center gap-3">
           <div className="w-12 h-12 rounded-2xl bg-gradient-to-tr from-cyan-500 to-blue-600 flex items-center justify-center shadow-lg shadow-cyan-500/20">

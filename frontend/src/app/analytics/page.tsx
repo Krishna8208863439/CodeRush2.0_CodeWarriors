@@ -2,20 +2,30 @@
 
 import React, { useEffect, useState } from 'react';
 import Link from 'next/link';
+import { useRouter } from 'next/navigation';
 import { BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer, PieChart, Pie, Cell } from 'recharts';
-import { ShieldCheck, BarChart3, TrendingUp, Award, Clock, ArrowLeft } from 'lucide-react';
+import { ShieldCheck, BarChart3, TrendingUp, Award, Clock, ArrowLeft, AlertCircle } from 'lucide-react';
 import { api } from '@/lib/api';
 
 const COLORS = ['#0284c7', '#3b82f6', '#10b981', '#f59e0b', '#ef4444'];
 
 export default function AnalyticsPage() {
+  const router = useRouter();
   const [byCategory, setByCategory] = useState<any[]>([]);
   const [byWard, setByWard] = useState<any[]>([]);
   const [deptPerformance, setDeptPerformance] = useState<any[]>([]);
   const [satisfaction, setSatisfaction] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
+    // Auth guard — analytics requires staff role
+    const token = typeof window !== 'undefined' ? localStorage.getItem('accessToken') : null;
+    if (!token) {
+      router.replace('/login?tab=officer&redirect=/analytics');
+      return;
+    }
+
     async function fetchAnalytics() {
       try {
         const [catRes, wardRes, deptRes, satRes] = await Promise.all([
@@ -30,16 +40,22 @@ export default function AnalyticsPage() {
         setDeptPerformance(deptRes.data.data || []);
         setSatisfaction(satRes.data.data || []);
       } catch (err: any) {
+        const status = err?.response?.status;
+        if (status === 401 || status === 403) {
+          setError('Access denied. Analytics requires Department Head, Commissioner, or Admin role.');
+        } else {
+          setError(err?.response?.data?.message || 'Failed to load analytics data. Please try again.');
+        }
         console.error('Analytics load error:', err.message);
       } finally {
         setLoading(false);
       }
     }
     fetchAnalytics();
-  }, []);
+  }, [router]);
 
   return (
-    <div className="min-h-screen bg-slate-950 text-slate-100 p-6 max-w-7xl mx-auto space-y-8">
+    <div className="bg-slate-950 text-slate-100 p-6 rounded-xl w-full mx-auto space-y-6">
       {/* Header */}
       <div className="flex items-center justify-between border-b border-slate-800 pb-6">
         <div className="flex items-center gap-3">
@@ -57,6 +73,11 @@ export default function AnalyticsPage() {
         <div className="py-20 text-center text-slate-400 text-sm">
           <div className="w-8 h-8 border-2 border-cyan-400 border-t-transparent rounded-full animate-spin mx-auto mb-3" />
           Loading aggregated performance analytics...
+        </div>
+      ) : error ? (
+        <div className="p-6 rounded-2xl bg-red-950/30 border border-red-700/40 text-red-400 text-sm flex items-center gap-3">
+          <AlertCircle className="w-5 h-5 shrink-0" />
+          <span>{error}</span>
         </div>
       ) : (
         <div className="grid grid-cols-1 md:grid-cols-2 gap-8">

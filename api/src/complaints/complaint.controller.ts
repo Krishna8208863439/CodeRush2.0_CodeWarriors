@@ -315,3 +315,27 @@ complaintRouter.get('/open-data', async (req: Request, res: Response) => {
   });
 });
 
+// 8. PATCH /complaints/:id/status (Officer status update — also reachable here so the
+//    frontend PATCH /complaints/:id/status call lands correctly regardless of router mount)
+complaintRouter.patch('/:id/status', authenticate, authorise([Role.OFFICER, Role.ADMIN, Role.DEPARTMENT_HEAD]), async (req: AuthenticatedRequest, res: Response) => {
+  try {
+    const { id } = req.params;
+    const { status, note } = req.body;
+
+    const validStatuses = ['IN_PROGRESS', 'RESOLVED', 'REJECTED'];
+    if (!status || !validStatuses.includes(status)) {
+      return res.status(400).json({ error: 'INVALID_STATUS', message: `Status must be one of: ${validStatuses.join(', ')}` });
+    }
+
+    await query(`UPDATE complaints SET status = $1, updated_at = NOW() WHERE id = $2`, [status, id]);
+    await query(
+      `INSERT INTO status_history (complaint_id, officer_id, status, note) VALUES ($1, $2, $3, $4)`,
+      [id, req.user!.sub, status, note || '']
+    );
+
+    return res.json({ message: `Complaint status updated to ${status}`, complaintId: id, status });
+  } catch (err: any) {
+    return res.status(500).json({ error: 'STATUS_UPDATE_FAILED', message: err.message });
+  }
+});
+

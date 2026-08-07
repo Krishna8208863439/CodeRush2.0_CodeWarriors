@@ -1,355 +1,291 @@
 'use client';
 
-import React, { useState, useEffect } from 'react';
-import Image from 'next/image';
+import React from 'react';
+import Link from 'next/link';
+import { useRouter } from 'next/navigation';
 import {
-  ShieldCheck, Activity, Cpu, MapPin, BarChart2, Users,
-  CheckCircle2, ArrowRight, AlertTriangle, PlusCircle, HelpCircle,
-  Lock, LayoutDashboard, Building2, UserCheck, Navigation, ChevronRight,
-  Clock, FileText, CheckCircle
+  ShieldCheck, Building2, ArrowRight, Layers, Zap, Clock,
+  CheckCircle2, FileText, Users, MapPin, BarChart2,
+  LogIn, LogOut, PhoneCall, Globe, UserCircle2, ShieldAlert,
 } from 'lucide-react';
+import { homepageContent } from '@/config/homepageContent';
 
-// Import sub-pages directly for Single-URL switching
-import NewComplaintPage from './complaints/new/page';
-import CitizenDashboard from './dashboard/citizen/page';
-import OfficerDashboard from './dashboard/officer/page';
-import DepartmentDashboard from './dashboard/department/page';
-import ExecutiveDashboard from './dashboard/executive/page';
-import AdminDashboard from './dashboard/admin/page';
-import MapPage from './map/page';
-import AnalyticsPage from './analytics/page';
-import PrivacyCenterPage from './privacy-center/page';
-import HelpPage from './help/page';
+export default function GovernmentCivicHomePage() {
+  const { topBar, navHeader, hero, stats, modulesHeading, modules } = homepageContent;
+  const router = useRouter();
+  const [user, setUser] = React.useState<any>(null);
 
-// ── Mock Feed Data ────────────────────────────────────────────────────────────
-const MOCK_FEED = [
-  { id: 'CVG-8924', category: 'Road Damage',    location: 'Ward 4 – Arterial Route', status: 'IN_PROGRESS', priority: 'Critical', confidence: 98, sla: '1h 45m left' },
-  { id: 'CVG-8910', category: 'Fallen Tree',    location: 'Ward 2 – Park Pathway',  status: 'ASSIGNED',    priority: 'High',     confidence: 85, sla: '8h 30m left' },
-  { id: 'CVG-8897', category: 'Street Light',   location: 'Ward 7 – Main Crossing', status: 'ASSIGNED',    priority: 'Medium',   confidence: 92, sla: '11h 15m left' },
-  { id: 'CVG-8810', category: 'Garbage Dump',   location: 'Ward 9 – Market Square', status: 'RESOLVED',    priority: 'Low',      confidence: 88, sla: 'Resolved' },
-];
-
-const METRICS = [
-  { label: 'Total Reports Today',  value: '1,248', change: '+12% vs last week', icon: Activity },
-  { label: 'SLA Adherence Rate',   value: '87.4%', change: 'Target: 85.0%',    icon: CheckCircle2 },
-  { label: 'Active Field Officers', value: '42',    change: 'Across 5 wards',   icon: Users },
-  { label: 'Critical Escalations', value: '14',    change: 'Requires action',   icon: AlertTriangle },
-];
-
-const SCREENS = [
-  { src: '/screen-citizen.png', label: 'Citizen Portal', tabId: 'citizen', desc: 'File reports, track timeline & view officer resolution proof.' },
-  { src: '/screen-officer.png', label: 'Officer Queue', tabId: 'officer', desc: 'SLA-sorted priority queue with GPS location & proof upload.' },
-  { src: '/screen-admin.png', label: 'Control Tower', tabId: 'executive', desc: 'Commissioner analytics, SLA adherence gauges & ward heatmaps.' },
-  { src: '/screen-auth.png', label: 'Secure Auth Portal', tabId: 'privacy', desc: 'Role-based login, mobile OTP authentication & privacy consent.' },
-];
-
-function LiveClock() {
-  const [time, setTime] = useState('');
-  useEffect(() => {
-    const tick = () => setTime(new Date().toLocaleTimeString('en-IN', { hour: '2-digit', minute: '2-digit' }));
-    tick();
-    const id = setInterval(tick, 1000);
-    return () => clearInterval(id);
+  React.useEffect(() => {
+    const stored = localStorage.getItem('user');
+    if (stored) {
+      try { setUser(JSON.parse(stored)); } catch { setUser(null); }
+    }
+    const onAuth = () => {
+      const s = localStorage.getItem('user');
+      try { setUser(s ? JSON.parse(s) : null); } catch { setUser(null); }
+    };
+    window.addEventListener('auth-changed', onAuth);
+    return () => window.removeEventListener('auth-changed', onAuth);
   }, []);
-  return <span className="font-mono text-xs text-gray-500">{time} IST</span>;
-}
 
-export default function FlatMinimalCivicPulseOS() {
-  const [activeTab, setActiveTab] = useState<
-    'overview' | 'new-complaint' | 'citizen' | 'officer' | 'department' | 'executive' | 'admin' | 'map' | 'analytics' | 'privacy' | 'help'
-  >('overview');
+  function handleLogout() {
+    localStorage.removeItem('accessToken');
+    localStorage.removeItem('refreshToken');
+    localStorage.removeItem('user');
+    setUser(null);
+    window.dispatchEvent(new Event('auth-changed'));
+    router.push('/');
+  }
 
-  const [activeScreen, setActiveScreen] = useState(0);
+  function dashboardHref(): string {
+    if (!user) return '/login';
+    switch (user.role) {
+      case 'CITIZEN':        return '/dashboard/citizen';
+      case 'OFFICER':        return `/dashboard/officer/${user.department ?? 'SWM'}`;
+      case 'DEPARTMENT_HEAD':return '/dashboard/department';
+      case 'COMMISSIONER':   return '/dashboard/executive';
+      case 'ADMIN':          return '/dashboard/admin';
+      default:               return '/dashboard/citizen';
+    }
+  }
+
+  const renderStatIcon = (name: string) => {
+    const s = 'w-5 h-5';
+    switch (name) {
+      case 'Layers':      return <Layers       className={`${s} text-blue-600`} />;
+      case 'Zap':         return <Zap          className={`${s} text-purple-600`} />;
+      case 'Clock':       return <Clock        className={`${s} text-emerald-600`} />;
+      case 'CheckCircle': return <CheckCircle2 className={`${s} text-teal-600`} />;
+      default:            return <Layers       className={s} />;
+    }
+  };
+
+  const renderModuleIcon = (name: string) => {
+    const s = 'w-5 h-5';
+    switch (name) {
+      case 'FileText':  return <FileText  className={s} />;
+      case 'Users':     return <Users     className={s} />;
+      case 'MapPin':    return <MapPin    className={s} />;
+      case 'BarChart2': return <BarChart2 className={s} />;
+      default:          return <FileText  className={s} />;
+    }
+  };
 
   return (
-    <div className="min-h-screen bg-[#fafafa] text-[#1f2937] font-sans antialiased">
-      {/* ── TOP NAVBAR ──────────────────────────────────────────────────────── */}
-      <header className="bg-white border-b border-gray-200 sticky top-0 z-50">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 h-16 flex items-center justify-between gap-4">
-          {/* Logo */}
-          <div className="flex items-center gap-3 shrink-0">
-            <button
-              onClick={() => setActiveTab('overview')}
-              className="flex items-center gap-2.5 text-left hover:opacity-90 transition-opacity"
-            >
-              <div className="w-9 h-9 rounded-lg bg-blue-600 flex items-center justify-center text-white">
-                <ShieldCheck className="w-5 h-5" />
-              </div>
-              <div>
-                <span className="font-bold text-base text-gray-900 leading-tight block">Community Redressal</span>
-                <span className="text-xs text-gray-500 font-medium">Civic Operating System</span>
-              </div>
-            </button>
+    <div className="min-h-screen bg-slate-100 text-slate-800 font-sans flex flex-col w-full">
+
+      {/* ── 1. TOP UTILITY BAR ───────────────────────────────────────── */}
+      <div className="bg-[#0a0f1d] text-slate-300 text-[11px] py-1.5 px-4 sm:px-8 border-b border-slate-800 w-full">
+        <div className="w-full flex flex-col sm:flex-row justify-between items-center gap-2">
+          <div className="flex items-center gap-2">
+            <ShieldCheck className="w-3.5 h-3.5 text-blue-400" />
+            <span className="font-bold tracking-wide uppercase text-slate-200">{topBar.systemLabel}</span>
+            <span className="hidden md:inline text-slate-600">|</span>
+            <span className="hidden md:inline text-slate-400">{topBar.subLabel}</span>
           </div>
 
-          {/* Nav Tabs */}
-          <nav className="flex items-center gap-1 overflow-x-auto py-1">
-            {[
-              { id: 'overview', label: 'Overview', icon: LayoutDashboard },
-              { id: 'new-complaint', label: 'File Complaint', icon: PlusCircle },
-              { id: 'citizen', label: 'Citizen', icon: Users },
-              { id: 'officer', label: 'Officer', icon: Navigation },
-              { id: 'department', label: 'Dept Head', icon: Building2 },
-              { id: 'executive', label: 'Commissioner', icon: BarChart2 },
-              { id: 'admin', label: 'Admin', icon: UserCheck },
-              { id: 'map', label: 'GIS Map', icon: MapPin },
-              { id: 'analytics', label: 'Analytics', icon: Activity },
-              { id: 'privacy', label: 'Privacy', icon: Lock },
-              { id: 'help', label: 'Help', icon: HelpCircle },
-            ].map((t) => {
-              const Icon = t.icon;
-              const isActive = activeTab === t.id;
-              return (
-                <button
-                  key={t.id}
-                  onClick={() => setActiveTab(t.id as any)}
-                  className={`flex items-center gap-1.5 px-3 py-2 rounded-lg text-xs font-semibold shrink-0 transition-colors ${
-                    isActive
-                      ? 'bg-blue-50 text-blue-700 border border-blue-200'
-                      : 'text-gray-600 hover:text-gray-900 hover:bg-gray-100'
-                  }`}
-                >
-                  <Icon className="w-3.5 h-3.5" />
-                  <span>{t.label}</span>
-                </button>
-              );
-            })}
-          </nav>
-
-          {/* Primary Action Button */}
-          <div className="shrink-0 hidden md:flex items-center gap-3">
-            <LiveClock />
-            <button
-              onClick={() => setActiveTab('new-complaint')}
-              className="btn-primary"
-            >
-              <PlusCircle className="w-4 h-4" />
-              <span>Submit Complaint</span>
-            </button>
-          </div>
-        </div>
-      </header>
-
-      {/* ── DYNAMIC MODULE VIEW ───────────────────────────────────────────── */}
-      {activeTab === 'new-complaint' && (
-        <div className="py-6 max-w-7xl mx-auto px-4"><NewComplaintPage /></div>
-      )}
-
-      {activeTab === 'citizen' && (
-        <div className="py-6 max-w-7xl mx-auto px-4"><CitizenDashboard /></div>
-      )}
-
-      {activeTab === 'officer' && (
-        <div className="py-6 max-w-7xl mx-auto px-4"><OfficerDashboard /></div>
-      )}
-
-      {activeTab === 'department' && (
-        <div className="py-6 max-w-7xl mx-auto px-4"><DepartmentDashboard /></div>
-      )}
-
-      {activeTab === 'executive' && (
-        <div className="py-6 max-w-7xl mx-auto px-4"><ExecutiveDashboard /></div>
-      )}
-
-      {activeTab === 'admin' && (
-        <div className="py-6 max-w-7xl mx-auto px-4"><AdminDashboard /></div>
-      )}
-
-      {activeTab === 'map' && (
-        <div className="py-6 max-w-7xl mx-auto px-4"><MapPage /></div>
-      )}
-
-      {activeTab === 'analytics' && (
-        <div className="py-6 max-w-7xl mx-auto px-4"><AnalyticsPage /></div>
-      )}
-
-      {activeTab === 'privacy' && (
-        <div className="py-6 max-w-7xl mx-auto px-4"><PrivacyCenterPage /></div>
-      )}
-
-      {activeTab === 'help' && (
-        <div className="py-6 max-w-7xl mx-auto px-4"><HelpPage /></div>
-      )}
-
-      {/* ── OVERVIEW LANDING VIEW ────────────────────────────────────────── */}
-      {activeTab === 'overview' && (
-        <main className="max-w-7xl mx-auto px-4 sm:px-6 py-10 space-y-10">
-
-          {/* HERO SECTION */}
-          <section className="bg-white border border-gray-200 rounded-xl p-8 md:p-12 text-center space-y-6">
-            <span className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-blue-50 text-blue-700 text-xs font-semibold border border-blue-100">
-              AI-Powered Municipal Grievance Platform
-            </span>
-
-            <h1 className="text-3xl md:text-5xl font-bold text-gray-900 tracking-tight max-w-3xl mx-auto leading-tight">
-              Community Redressal Planner
-            </h1>
-
-            <p className="text-base text-gray-600 max-w-2xl mx-auto leading-relaxed">
-              Accept grievances in text, voice, or images across 7 Indian languages.
-              AI automatically classifies issues, merges duplicates, predicts priorities, and enforces SLA timelines.
-            </p>
-
-            <div className="flex flex-col sm:flex-row items-center justify-center gap-3 pt-2">
-              <button
-                onClick={() => setActiveTab('new-complaint')}
-                className="btn-primary text-base px-6 py-3"
-              >
-                <PlusCircle className="w-5 h-5" />
-                <span>Submit a Complaint</span>
-              </button>
-              <button
-                onClick={() => setActiveTab('map')}
-                className="btn-secondary text-base px-6 py-3"
-              >
-                <MapPin className="w-5 h-5 text-gray-500" />
-                <span>View Live GIS Map</span>
-              </button>
+          <div className="flex items-center gap-3 text-[10px] text-slate-400">
+            <div className="flex items-center gap-1">
+              <PhoneCall className="w-3 h-3 text-slate-400" />
+              <span>{topBar.helpline}</span>
             </div>
-          </section>
-
-          {/* KEY METRICS */}
-          <section className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-            {METRICS.map((m, i) => {
-              const Icon = m.icon;
-              return (
-                <div key={i} className="card-flat p-5 space-y-2">
-                  <div className="flex items-center justify-between text-gray-500">
-                    <span className="text-xs font-semibold text-gray-500 uppercase tracking-wider">{m.label}</span>
-                    <Icon className="w-4 h-4 text-blue-600" />
-                  </div>
-                  <p className="text-2xl font-bold text-gray-900">{m.value}</p>
-                  <p className="text-xs font-medium text-gray-500">{m.change}</p>
-                </div>
-              );
-            })}
-          </section>
-
-          {/* PLATFORM SCREENSHOTS CAROUSEL */}
-          <section className="bg-white border border-gray-200 rounded-xl p-6 md:p-8 space-y-6">
-            <div>
-              <h2 className="text-xl font-bold text-gray-900">Platform Screens & Workflows</h2>
-              <p className="text-sm text-gray-500 mt-1">Select a screen preview to open the live interactive module</p>
-            </div>
-
-            <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-center">
-              {/* Screen Display */}
-              <div className="lg:col-span-5 flex justify-center">
-                <div className="w-[260px] border border-gray-300 rounded-2xl bg-white p-2 shadow-sm">
-                  <div className="relative rounded-xl overflow-hidden" style={{ height: '460px' }}>
-                    <Image
-                      src={SCREENS[activeScreen].src}
-                      alt={SCREENS[activeScreen].label}
-                      fill
-                      className="object-cover object-top"
-                      priority
-                      unoptimized
-                    />
-                  </div>
-                </div>
-              </div>
-
-              {/* Selector List */}
-              <div className="lg:col-span-7 space-y-3">
-                {SCREENS.map((s, i) => (
-                  <button
-                    key={i}
-                    onClick={() => {
-                      setActiveScreen(i);
-                      setActiveTab(s.tabId as any);
-                    }}
-                    className={`w-full p-4 rounded-xl border text-left transition-all flex items-start gap-4 ${
-                      activeScreen === i
-                        ? 'border-blue-500 bg-blue-50/50'
-                        : 'border-gray-200 bg-white hover:border-gray-300'
-                    }`}
-                  >
-                    <div className="w-8 h-8 rounded-lg bg-blue-100 text-blue-700 flex items-center justify-center font-bold text-sm shrink-0">
-                      {i + 1}
-                    </div>
-                    <div className="flex-1">
-                      <div className="flex items-center justify-between">
-                        <h3 className="font-semibold text-gray-900 text-sm">{s.label}</h3>
-                        <span className="text-xs font-semibold text-blue-600 flex items-center gap-1">
-                          Open <ChevronRight className="w-3.5 h-3.5" />
-                        </span>
-                      </div>
-                      <p className="text-xs text-gray-500 mt-1">{s.desc}</p>
-                    </div>
-                  </button>
+            <span className="text-slate-700">|</span>
+            <div className="flex items-center gap-1.5">
+              <Globe className="w-3 h-3 text-slate-400" />
+              <span>Accessibility:</span>
+              <div className="flex gap-1 font-semibold text-slate-300">
+                {topBar.accessibility.map((a, i) => (
+                  <span key={i} className="hover:text-blue-400 cursor-pointer">{a}</span>
                 ))}
               </div>
             </div>
-          </section>
 
-          {/* LIVE COMPLAINT FEED */}
-          <section className="bg-white border border-gray-200 rounded-xl p-6 md:p-8 space-y-4">
-            <div className="flex items-center justify-between border-b border-gray-100 pb-4">
-              <div>
-                <h2 className="text-lg font-bold text-gray-900">Recent Incident Feed</h2>
-                <p className="text-xs text-gray-500">Real-time reports processed by AI classification</p>
-              </div>
-              <button
-                onClick={() => setActiveTab('officer')}
-                className="text-xs font-semibold text-blue-600 hover:underline flex items-center gap-1"
+            {/* Login entry points — only when logged out */}
+            {!user && (
+              <>
+                <span className="text-slate-700">|</span>
+                <Link
+                  href="/login?tab=citizen"
+                  className="flex items-center gap-1 text-slate-300 hover:text-white font-semibold transition-colors"
+                  aria-label="Citizen Login"
+                >
+                  <UserCircle2 className="w-3.5 h-3.5 text-blue-400" />
+                  <span>Citizen Login</span>
+                </Link>
+                <span className="text-slate-700">|</span>
+                <Link
+                  href="/login?tab=officer"
+                  className="flex items-center gap-1 text-amber-400 hover:text-amber-300 font-semibold transition-colors"
+                  aria-label="Officer / Admin Login"
+                >
+                  <ShieldAlert className="w-3.5 h-3.5" />
+                  <span>Officer&nbsp;/&nbsp;Admin Login</span>
+                </Link>
+              </>
+            )}
+          </div>
+        </div>
+      </div>
+
+      {/* ── 2. MAIN NAV HEADER ───────────────────────────────────────── */}
+      <header className="bg-[#0f172a] text-white py-3.5 px-4 sm:px-8 shadow-md border-b border-slate-800 w-full">
+        <div className="w-full flex justify-between items-center">
+          <Link href="/" className="flex items-center gap-3 group">
+            <div className="w-10 h-10 rounded-lg bg-blue-700 text-white flex items-center justify-center shadow-sm">
+              <Building2 className="w-6 h-6" />
+            </div>
+            <div>
+              <h1 className="font-extrabold text-base sm:text-lg leading-tight tracking-tight text-white">
+                {navHeader.title}
+              </h1>
+              <p className="text-[11px] text-slate-400 leading-none mt-0.5">{navHeader.subtitle}</p>
+            </div>
+          </Link>
+
+          {/* Logged-in: name + dashboard link + logout. Logged-out: two login buttons. */}
+          {user ? (
+            <div className="flex items-center gap-2">
+              <Link
+                href={dashboardHref()}
+                className="bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 text-white font-bold text-xs px-4 py-2 rounded-lg flex items-center gap-2 shadow transition-all"
               >
-                View Officer Queue <ChevronRight className="w-3.5 h-3.5" />
+                <LogIn className="w-4 h-4" />
+                <span>{user.name} — Dashboard</span>
+              </Link>
+              <button
+                onClick={handleLogout}
+                className="text-slate-400 hover:text-white p-2 rounded-lg hover:bg-slate-800 transition-colors"
+                aria-label="Sign out"
+                title="Sign out"
+              >
+                <LogOut className="w-4 h-4" />
               </button>
             </div>
-
-            <div className="divide-y divide-gray-100">
-              {MOCK_FEED.map((item) => (
-                <div key={item.id} className="py-3.5 flex flex-col sm:flex-row sm:items-center justify-between gap-3">
-                  <div className="space-y-1">
-                    <div className="flex items-center gap-2">
-                      <span className="font-mono text-xs font-bold text-gray-900">{item.id}</span>
-                      <span className="text-xs font-medium text-gray-700 bg-gray-100 px-2 py-0.5 rounded">
-                        {item.category}
-                      </span>
-                      <span className={`pill ${
-                        item.status === 'RESOLVED' ? 'pill-resolved' :
-                        item.status === 'IN_PROGRESS' ? 'pill-progress' : 'pill-assigned'
-                      }`}>
-                        {item.status.replace('_', ' ')}
-                      </span>
-                    </div>
-                    <p className="text-xs text-gray-500 flex items-center gap-1">
-                      <MapPin className="w-3 h-3 text-gray-400" /> {item.location}
-                    </p>
-                  </div>
-
-                  <div className="flex items-center gap-4 text-xs font-medium">
-                    <span className="text-gray-500">
-                      Priority: <strong className="text-gray-900">{item.priority}</strong>
-                    </span>
-                    <span className="text-gray-500">
-                      SLA: <strong className="text-blue-600">{item.sla}</strong>
-                    </span>
-                    <span className="text-xs font-semibold text-emerald-700 bg-emerald-50 px-2 py-1 rounded border border-emerald-200">
-                      {item.confidence}% AI Confidence
-                    </span>
-                  </div>
-                </div>
-              ))}
+          ) : (
+            <div className="flex items-center gap-2">
+              <Link
+                href="/login?tab=citizen"
+                className="bg-[#1e3a8a] hover:bg-[#1e40af] text-white font-bold text-xs px-4 py-2 rounded-lg flex items-center gap-1.5 shadow transition-all"
+              >
+                <UserCircle2 className="w-4 h-4" />
+                <span className="hidden sm:inline">Citizen Login</span>
+                <span className="sm:hidden">Login</span>
+              </Link>
+              <Link
+                href="/login?tab=officer"
+                className="bg-[#0f172a] hover:bg-[#1e293b] border border-amber-400/40 text-amber-400 font-bold text-xs px-4 py-2 rounded-lg flex items-center gap-1.5 shadow transition-all"
+              >
+                <ShieldAlert className="w-4 h-4" />
+                <span className="hidden sm:inline">Officer&nbsp;/&nbsp;Admin</span>
+                <span className="sm:hidden">Official</span>
+              </Link>
             </div>
-          </section>
+          )}
+        </div>
+      </header>
 
-        </main>
-      )}
+      {/* ── MAIN CONTENT ─────────────────────────────────────────────── */}
+      <main className="w-full px-4 sm:px-6 lg:px-8 py-6 space-y-6 flex-1">
 
-      {/* ── FOOTER ─────────────────────────────────────────────────────────── */}
-      <footer className="bg-white border-t border-gray-200 mt-16 py-8">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 flex flex-col sm:flex-row items-center justify-between gap-4 text-xs text-gray-500">
-          <div className="flex items-center gap-2">
-            <ShieldCheck className="w-4 h-4 text-blue-600" />
-            <span className="font-semibold text-gray-700">Community Redressal Planner</span>
-            <span>— AI Civic Operating System</span>
+        {/* ── 3. HERO BANNER ─────────────────────────────────────────── */}
+        <section className="bg-white rounded-2xl border border-slate-200 p-6 sm:p-8 shadow-sm flex flex-col lg:flex-row justify-between items-start lg:items-center gap-6 w-full">
+          <div className="space-y-3 max-w-5xl">
+            <div className="inline-flex items-center gap-1.5 bg-blue-50 border border-blue-200 text-blue-800 text-xs font-semibold px-3 py-1 rounded-full">
+              <ShieldCheck className="w-3.5 h-3.5 text-blue-600" />
+              <span>{hero.badge}</span>
+            </div>
+            <h2 className="text-2xl sm:text-3xl lg:text-4xl font-extrabold text-slate-900 leading-tight">
+              {hero.headline}
+            </h2>
+            <p className="text-xs sm:text-sm lg:text-base text-slate-600 leading-relaxed">
+              {hero.description}
+            </p>
           </div>
-          <div className="flex items-center gap-4">
-            <button onClick={() => setActiveTab('privacy')} className="hover:text-gray-900 transition-colors">Privacy Center</button>
-            <button onClick={() => setActiveTab('help')} className="hover:text-gray-900 transition-colors">Help Center</button>
-            <a href="http://localhost:3001/complaints/open-data" target="_blank" rel="noreferrer" className="hover:text-gray-900 transition-colors">Open Data API</a>
+
+          <div className="flex flex-col sm:flex-row lg:flex-col gap-3 w-full lg:w-64 shrink-0">
+            {/*
+              "Submit Grievance" CTA:
+              - Logged in  → go straight to /complaints/new
+              - Logged out → go to /login?tab=citizen&redirect=/complaints/new
+                             (the login page will redirect back after auth)
+            */}
+            <Link
+              href={user ? '/complaints/new' : '/login?tab=citizen&redirect=/complaints/new'}
+              className="bg-[#1e3a8a] hover:bg-[#1e40af] text-white font-bold text-xs sm:text-sm px-5 py-3.5 rounded-xl flex items-center justify-between gap-3 shadow transition-colors w-full"
+            >
+              <div className="flex items-center gap-2">
+                <FileText className="w-4 h-4 text-blue-300" />
+                <span>{hero.primaryCta.label}</span>
+              </div>
+              <ArrowRight className="w-4 h-4" />
+            </Link>
+
+            <Link
+              href={hero.secondaryCta.href}
+              className="bg-[#0f172a] hover:bg-[#1e293b] text-white font-bold text-xs sm:text-sm px-5 py-3.5 rounded-xl flex items-center gap-2 shadow border border-slate-800 transition-colors w-full"
+            >
+              <MapPin className="w-4 h-4 text-amber-400" />
+              <span>{hero.secondaryCta.label}</span>
+            </Link>
           </div>
+        </section>
+
+        {/* ── 4. STATS STRIP ─────────────────────────────────────────── */}
+        <section className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 w-full">
+          {stats.map((stat, idx) => (
+            <div key={idx} className="bg-white border border-slate-200 rounded-xl p-5 flex items-center gap-4 shadow-sm">
+              <div className="w-12 h-12 rounded-xl bg-slate-50 border border-slate-100 flex items-center justify-center shrink-0">
+                {renderStatIcon(stat.iconName)}
+              </div>
+              <div>
+                <span className="text-xs font-bold text-slate-400 tracking-wider uppercase block">{stat.label}</span>
+                <span className={`text-2xl font-extrabold ${stat.color || 'text-slate-900'}`}>{stat.value}</span>
+              </div>
+            </div>
+          ))}
+        </section>
+
+        {/* ── 5. CIVIC GOVERNANCE MODULES ────────────────────────────── */}
+        <section className="space-y-4 w-full">
+          <div className="flex items-center gap-2 text-lg font-bold text-slate-900">
+            <ShieldCheck className="w-5 h-5 text-blue-700" />
+            <h3>{modulesHeading}</h3>
+          </div>
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 w-full">
+            {modules.map((item) => (
+              <div
+                key={item.id}
+                className="bg-white border border-slate-200 rounded-xl p-6 flex flex-col justify-between hover:border-blue-400 transition-all duration-150 shadow-sm"
+              >
+                <div className="space-y-3">
+                  <div className={`w-12 h-12 rounded-xl flex items-center justify-center shadow-sm ${item.iconBg}`}>
+                    {renderModuleIcon(item.iconName)}
+                  </div>
+                  <h4 className="text-base font-bold text-slate-900">{item.numberPrefix} {item.title}</h4>
+                  <p className="text-xs sm:text-sm text-slate-500 leading-relaxed">{item.description}</p>
+                </div>
+                <div className="pt-4 border-t border-slate-100 mt-4">
+                  <Link
+                    href={item.linkHref}
+                    className="text-xs sm:text-sm font-bold text-blue-700 hover:text-blue-900 flex items-center gap-1.5 transition-colors"
+                  >
+                    <span>{item.linkText}</span>
+                    <ArrowRight className="w-4 h-4" />
+                  </Link>
+                </div>
+              </div>
+            ))}
+          </div>
+        </section>
+      </main>
+
+      {/* ── FOOTER ───────────────────────────────────────────────────── */}
+      <footer className="bg-[#0f172a] text-slate-400 text-xs py-4 px-6 border-t border-slate-800 mt-auto w-full">
+        <div className="w-full flex flex-col sm:flex-row justify-between items-center gap-2 text-center sm:text-left">
+          <p>© {new Date().getFullYear()} Community Redressal Planner. All rights reserved.</p>
+          <p className="text-[11px] text-slate-500">
+            Ministry of Urban Development &amp; Municipal Governance · Civic Operating System
+          </p>
         </div>
       </footer>
     </div>

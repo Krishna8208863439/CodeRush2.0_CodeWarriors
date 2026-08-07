@@ -10,6 +10,15 @@ export default function NewComplaintPage() {
   const router = useRouter();
   const [channel, setChannel] = useState<'text' | 'image' | 'voice' | 'audio' | 'video'>('text');
 
+  // Auth guard — redirect to login if no token present
+  React.useEffect(() => {
+    if (typeof window === 'undefined') return;
+    const token = localStorage.getItem('accessToken');
+    if (!token) {
+      router.replace('/login?tab=citizen&redirect=/complaints/new');
+    }
+  }, [router]);
+
   // Form State
   const [title, setTitle] = useState('');
   const [description, setDescription] = useState('');
@@ -89,125 +98,146 @@ export default function NewComplaintPage() {
   };
 
   return (
-    <div className="min-h-screen bg-slate-950 text-slate-100 flex flex-col items-center justify-center p-6 relative overflow-hidden">
-      <div className="w-full max-w-2xl glass-panel p-8 rounded-3xl shadow-2xl relative z-10 border border-slate-800">
-        <div className="flex items-center justify-between border-b border-slate-800 pb-4 mb-6">
+    <div className="min-h-screen bg-[#F8FAFC] flex flex-col items-center justify-center p-4 sm:p-6 text-[#111827]">
+      
+      {/* Main Complaint Form Card */}
+      <div className="w-full max-w-2xl bg-white border border-[#E5E7EB] rounded-[20px] shadow-[0_10px_30px_rgba(0,0,0,0.08)] p-8 mt-6">
+        
+        {/* Header */}
+        <div className="flex items-center justify-between border-b border-[#E5E7EB] pb-5 mb-6">
           <div className="flex items-center gap-3">
-            <div className="w-10 h-10 rounded-xl bg-gradient-to-tr from-cyan-500 to-blue-600 flex items-center justify-center">
-              <ShieldCheck className="w-6 h-6 text-white" />
+            <div className="w-11 h-11 rounded-xl bg-[#2563EB] flex items-center justify-center text-white shadow-sm">
+              <ShieldCheck className="w-6 h-6" />
             </div>
             <div>
-              <h2 className="text-xl font-bold text-white">File Municipal Complaint</h2>
-              <p className="text-xs text-slate-400">Phase 1 Multi-Channel Intake</p>
+              <h2 className="text-xl font-bold text-[#111827]">File Municipal Complaint</h2>
+              <p className="text-xs text-gray-500 font-medium">Phase 1 Multi-Channel Intake</p>
             </div>
           </div>
-          <Link href="/dashboard/citizen" className="text-xs text-cyan-400 hover:underline">
+          <Link href="/dashboard/citizen" className="text-xs font-semibold text-[#2563EB] hover:underline">
             Back to Dashboard
           </Link>
         </div>
 
         {referenceId ? (
           <div className="py-8 text-center space-y-4">
-            <div className="w-16 h-16 rounded-full bg-green-500/20 text-green-400 flex items-center justify-center mx-auto mb-2">
+            <div className="w-16 h-16 rounded-full bg-emerald-100 text-emerald-600 flex items-center justify-center mx-auto mb-2 border border-emerald-200">
               <CheckCircle className="w-10 h-10" />
             </div>
-            <h3 className="text-2xl font-bold text-white">Complaint Submitted!</h3>
-            <p className="text-sm text-slate-400">
+            <h3 className="text-2xl font-bold text-[#111827]">Complaint Submitted!</h3>
+            <p className="text-sm text-gray-600">
               Your unique complaint reference ID is:
             </p>
-            <div className="inline-block bg-slate-900 border border-slate-800 rounded-2xl px-6 py-3 text-xl font-mono font-bold text-cyan-400 tracking-wider shadow-inner">
+            <div className="inline-block bg-[#F8FAFC] border border-[#E5E7EB] rounded-2xl px-6 py-3.5 text-2xl font-mono font-bold text-[#2563EB] tracking-wider shadow-xs">
               {referenceId}
             </div>
-            <p className="text-xs text-slate-500 max-w-md mx-auto">
+            <p className="text-xs text-gray-500 max-w-md mx-auto leading-relaxed">
               Our AI Understanding Layer will classify, deduplicate, and route your complaint to the appropriate municipal department.
             </p>
             <div className="pt-4 flex gap-4 justify-center">
               <button
                 onClick={() => setReferenceId(null)}
-                className="px-5 py-2.5 rounded-xl bg-slate-900 border border-slate-800 text-xs font-semibold text-slate-300 hover:text-white"
+                className="px-5 py-2.5 rounded-xl bg-white border border-[#D1D5DB] text-xs font-semibold text-gray-700 hover:bg-gray-50 transition-colors"
               >
                 Submit Another Complaint
               </button>
               <Link
                 href="/dashboard/citizen"
-                className="px-5 py-2.5 rounded-xl glass-button text-xs font-bold text-white shadow-md flex items-center gap-1"
+                className="px-5 py-2.5 rounded-xl bg-[#2563EB] text-xs font-bold text-white shadow-sm hover:bg-[#1D4ED8] flex items-center gap-1.5 transition-colors"
               >
                 View Track Progress <ArrowRight className="w-4 h-4" />
               </Link>
             </div>
           </div>
         ) : (
-          <div>
-            {/* Channel Tabs */}
-            <div className="grid grid-cols-5 gap-2 p-1 bg-slate-900/80 rounded-2xl mb-6 border border-slate-800">
-              <button
-                type="button"
-                onClick={() => setChannel('text')}
-                className={`flex flex-col items-center py-2.5 px-2 rounded-xl text-xs font-semibold transition-all ${
-                  channel === 'text' ? 'bg-cyan-500 text-white shadow-md' : 'text-slate-400 hover:text-white'
-                }`}
-              >
-                <FileText className="w-4 h-4 mb-1" />
-                Text
-              </button>
-              <button
-                type="button"
-                onClick={() => setChannel('image')}
-                className={`flex flex-col items-center py-2.5 px-2 rounded-xl text-xs font-semibold transition-all ${
-                  channel === 'image' ? 'bg-cyan-500 text-white shadow-md' : 'text-slate-400 hover:text-white'
-                }`}
-              >
-                <ImageIcon className="w-4 h-4 mb-1" />
-                Image
-              </button>
-              <button
-                type="button"
-                onClick={() => setChannel('voice')}
-                className={`flex flex-col items-center py-2.5 px-2 rounded-xl text-xs font-semibold transition-all ${
-                  channel === 'voice' ? 'bg-cyan-500 text-white shadow-md' : 'text-slate-400 hover:text-white'
-                }`}
-              >
-                <Mic className="w-4 h-4 mb-1" />
-                Voice
-              </button>
-              <button
-                type="button"
-                onClick={() => setChannel('audio')}
-                className={`flex flex-col items-center py-2.5 px-2 rounded-xl text-xs font-semibold transition-all ${
-                  channel === 'audio' ? 'bg-cyan-500 text-white shadow-md' : 'text-slate-400 hover:text-white'
-                }`}
-              >
-                <Volume2 className="w-4 h-4 mb-1" />
-                Audio
-              </button>
-              <button
-                type="button"
-                onClick={() => setChannel('video')}
-                className={`flex flex-col items-center py-2.5 px-2 rounded-xl text-xs font-semibold transition-all ${
-                  channel === 'video' ? 'bg-cyan-500 text-white shadow-md' : 'text-slate-400 hover:text-white'
-                }`}
-              >
-                <Video className="w-4 h-4 mb-1" />
-                Video
-              </button>
+          <div className="space-y-6">
+            
+            {/* Complaint Type Tabs (Text, Image, Voice, Audio, Video) */}
+            <div>
+              <label className="block text-sm font-semibold text-[#111827] mb-2">Select Intake Channel</label>
+              <div className="grid grid-cols-5 gap-2 p-1.5 bg-white border border-[#E5E7EB] rounded-[16px] shadow-xs">
+                <button
+                  type="button"
+                  onClick={() => setChannel('text')}
+                  className={`flex flex-col items-center justify-center py-2.5 px-2 rounded-[12px] text-xs font-semibold transition-all ${
+                    channel === 'text'
+                      ? 'bg-[#2563EB] text-white shadow-sm'
+                      : 'bg-white border border-[#E5E7EB] text-[#374151] hover:bg-gray-50'
+                  }`}
+                >
+                  <FileText className="w-4 h-4 mb-1" />
+                  Text
+                </button>
+                <button
+                  type="button"
+                  onClick={() => setChannel('image')}
+                  className={`flex flex-col items-center justify-center py-2.5 px-2 rounded-[12px] text-xs font-semibold transition-all ${
+                    channel === 'image'
+                      ? 'bg-[#2563EB] text-white shadow-sm'
+                      : 'bg-white border border-[#E5E7EB] text-[#374151] hover:bg-gray-50'
+                  }`}
+                >
+                  <ImageIcon className="w-4 h-4 mb-1" />
+                  Image
+                </button>
+                <button
+                  type="button"
+                  onClick={() => setChannel('voice')}
+                  className={`flex flex-col items-center justify-center py-2.5 px-2 rounded-[12px] text-xs font-semibold transition-all ${
+                    channel === 'voice'
+                      ? 'bg-[#2563EB] text-white shadow-sm'
+                      : 'bg-white border border-[#E5E7EB] text-[#374151] hover:bg-gray-50'
+                  }`}
+                >
+                  <Mic className="w-4 h-4 mb-1" />
+                  Voice
+                </button>
+                <button
+                  type="button"
+                  onClick={() => setChannel('audio')}
+                  className={`flex flex-col items-center justify-center py-2.5 px-2 rounded-[12px] text-xs font-semibold transition-all ${
+                    channel === 'audio'
+                      ? 'bg-[#2563EB] text-white shadow-sm'
+                      : 'bg-white border border-[#E5E7EB] text-[#374151] hover:bg-gray-50'
+                  }`}
+                >
+                  <Volume2 className="w-4 h-4 mb-1" />
+                  Audio
+                </button>
+                <button
+                  type="button"
+                  onClick={() => setChannel('video')}
+                  className={`flex flex-col items-center justify-center py-2.5 px-2 rounded-[12px] text-xs font-semibold transition-all ${
+                    channel === 'video'
+                      ? 'bg-[#2563EB] text-white shadow-sm'
+                      : 'bg-white border border-[#E5E7EB] text-[#374151] hover:bg-gray-50'
+                  }`}
+                >
+                  <Video className="w-4 h-4 mb-1" />
+                  Video
+                </button>
+              </div>
             </div>
 
             {error && (
-              <div className="mb-4 p-3 rounded-xl bg-red-500/10 border border-red-500/30 flex items-center gap-2 text-red-400 text-xs">
-                <AlertCircle className="w-4 h-4 shrink-0" />
+              <div className="p-3.5 rounded-[12px] bg-red-50 border border-red-200 flex items-center gap-2.5 text-red-700 text-sm">
+                <AlertCircle className="w-5 h-5 shrink-0" />
                 <span>{error}</span>
               </div>
             )}
 
-            <form onSubmit={handleSubmit} className="space-y-4">
+            {/* Form Fields with 20px gap */}
+            <form onSubmit={handleSubmit} className="space-y-[20px]" noValidate>
+              
               {channel === 'text' && (
                 <>
+                  {/* Select Language */}
                   <div>
-                    <label className="block text-xs font-semibold text-slate-300 mb-1">Select Language</label>
+                    <label className="block text-sm font-semibold text-[#111827] mb-1.5">Select Language</label>
                     <select
                       value={language}
                       onChange={(e) => setLanguage(e.target.value)}
-                      className="w-full bg-slate-900/90 border border-slate-800 rounded-xl px-4 py-2.5 text-sm text-white focus:outline-none focus:border-cyan-500"
+                      className="w-full bg-white border border-[#D1D5DB] rounded-[12px] h-[52px] px-4 text-base text-[#111827] focus:border-[#2563EB] focus:ring-4 focus:ring-[#2563EB]/15 focus:outline-none transition-all font-medium"
                     >
                       <option value="EN">English</option>
                       <option value="HI">Hindi (हिंदी)</option>
@@ -218,61 +248,69 @@ export default function NewComplaintPage() {
                     </select>
                   </div>
 
+                  {/* Issue Title */}
                   <div>
-                    <label className="block text-xs font-semibold text-slate-300 mb-1">Issue Title</label>
+                    <label className="block text-sm font-semibold text-[#111827] mb-1.5">Issue Title</label>
                     <input
                       type="text"
                       value={title}
                       onChange={(e) => setTitle(e.target.value)}
                       placeholder="e.g. Overflowing garbage bin near Ward 4 main road"
-                      className="w-full bg-slate-900/90 border border-slate-800 rounded-xl px-4 py-2.5 text-sm text-white focus:outline-none focus:border-cyan-500"
+                      className="w-full bg-white border border-[#D1D5DB] rounded-[12px] h-[52px] px-4 text-base text-[#111827] placeholder-[#9CA3AF] focus:border-[#2563EB] focus:ring-4 focus:ring-[#2563EB]/15 focus:outline-none transition-all font-normal"
                     />
                   </div>
 
+                  {/* Detailed Description */}
                   <div>
-                    <label className="block text-xs font-semibold text-slate-300 mb-1">Detailed Description</label>
+                    <label className="block text-sm font-semibold text-[#111827] mb-1.5">Detailed Description</label>
                     <textarea
                       required
-                      rows={4}
                       value={description}
                       onChange={(e) => setDescription(e.target.value)}
                       placeholder="Describe the complaint in detail..."
-                      className="w-full bg-slate-900/90 border border-slate-800 rounded-xl px-4 py-2.5 text-sm text-white focus:outline-none focus:border-cyan-500"
+                      className="w-full bg-white border border-[#D1D5DB] rounded-[12px] h-[140px] p-4 text-base text-[#111827] placeholder-[#9CA3AF] focus:border-[#2563EB] focus:ring-4 focus:ring-[#2563EB]/15 focus:outline-none transition-all font-normal"
                     />
                   </div>
                 </>
               )}
 
               {channel !== 'text' && (
-                <div>
-                  <label className="block text-xs font-semibold text-slate-300 mb-1">Select {channel.toUpperCase()} File</label>
-                  <input
-                    type="file"
-                    required
-                    onChange={(e) => setFile(e.target.files?.[0] || null)}
-                    className="w-full bg-slate-900/90 border border-slate-800 rounded-xl p-3 text-sm text-slate-300 file:mr-4 file:py-2 file:px-4 file:rounded-lg file:border-0 file:text-xs file:font-semibold file:bg-cyan-500 file:text-white hover:file:bg-cyan-600"
-                  />
-                  <div className="mt-3">
-                    <label className="block text-xs font-semibold text-slate-300 mb-1">Optional Note / Caption</label>
+                <>
+                  {/* File Upload Field */}
+                  <div>
+                    <label className="block text-sm font-semibold text-[#111827] mb-1.5">
+                      Upload {channel.charAt(0).toUpperCase() + channel.slice(1)} File
+                    </label>
+                    <input
+                      type="file"
+                      required
+                      onChange={(e) => setFile(e.target.files?.[0] || null)}
+                      className="w-full bg-white border border-[#D1D5DB] rounded-[12px] p-3 text-sm text-gray-700 file:mr-4 file:py-2 file:px-4 file:rounded-lg file:border-0 file:text-xs file:font-semibold file:bg-[#2563EB] file:text-white hover:file:bg-[#1D4ED8] focus:border-[#2563EB] focus:ring-4 focus:ring-[#2563EB]/15 focus:outline-none transition-all"
+                    />
+                  </div>
+
+                  {/* Optional Note */}
+                  <div>
+                    <label className="block text-sm font-semibold text-[#111827] mb-1.5">Optional Note / Caption</label>
                     <input
                       type="text"
                       value={description}
                       onChange={(e) => setDescription(e.target.value)}
                       placeholder="Add brief context..."
-                      className="w-full bg-slate-900/90 border border-slate-800 rounded-xl px-4 py-2.5 text-sm text-white focus:outline-none focus:border-cyan-500"
+                      className="w-full bg-white border border-[#D1D5DB] rounded-[12px] h-[52px] px-4 text-base text-[#111827] placeholder-[#9CA3AF] focus:border-[#2563EB] focus:ring-4 focus:ring-[#2563EB]/15 focus:outline-none transition-all"
                     />
                   </div>
-                </div>
+                </>
               )}
 
               {/* GIS Location Picker */}
               <div>
-                <div className="flex justify-between items-center mb-1">
-                  <label className="block text-xs font-semibold text-slate-300">GIS Location Coordinates</label>
+                <div className="flex justify-between items-center mb-1.5">
+                  <label className="block text-sm font-semibold text-[#111827]">GIS Location Coordinates</label>
                   <button
                     type="button"
                     onClick={handleGetLocation}
-                    className="text-xs text-cyan-400 hover:underline flex items-center gap-1"
+                    className="border border-[#2563EB] bg-white hover:bg-blue-50 text-[#2563EB] font-semibold text-xs py-1.5 px-3 rounded-lg flex items-center gap-1.5 transition-colors shadow-2xs"
                   >
                     <MapPin className="w-3.5 h-3.5" />
                     Detect My Location
@@ -283,21 +321,24 @@ export default function NewComplaintPage() {
                   value={address}
                   onChange={(e) => setAddress(e.target.value)}
                   placeholder="Address or Geo Coordinates"
-                  className="w-full bg-slate-900/90 border border-slate-800 rounded-xl px-4 py-2.5 text-sm text-white focus:outline-none focus:border-cyan-500"
+                  className="w-full bg-white border border-[#D1D5DB] rounded-[12px] h-[52px] px-4 text-base text-[#111827] placeholder-[#9CA3AF] focus:border-[#2563EB] focus:ring-4 focus:ring-[#2563EB]/15 focus:outline-none transition-all"
                 />
               </div>
 
+              {/* Submit Button */}
               <button
                 type="submit"
                 disabled={loading}
-                className="w-full py-3 rounded-xl glass-button text-sm font-bold text-white shadow-lg flex items-center justify-center gap-2 mt-6"
+                className="w-full h-[56px] bg-[#2563EB] hover:bg-[#1D4ED8] text-white font-semibold text-[17px] rounded-[14px] shadow-[0_8px_20px_rgba(37,99,235,0.25)] hover:-translate-y-0.5 transition-all duration-200 flex items-center justify-center gap-2 mt-6"
               >
                 {loading ? 'Processing Complaint...' : 'Submit Complaint'}
-                <ArrowRight className="w-4 h-4" />
+                <ArrowRight className="w-5 h-5" />
               </button>
+
             </form>
           </div>
         )}
+
       </div>
     </div>
   );

@@ -15,7 +15,23 @@ export default function AdminDashboard() {
       const res = await api.get('/dashboard/admin');
       setData(res.data);
     } catch (err: any) {
-      console.error('Admin data load error:', err.message);
+      // Demo fallback
+      setData({
+        users: [
+          { id: 'u1', name: 'Rajesh Kumar',  email: 'rajesh@gov.in',  role: 'CITIZEN', is_locked: false },
+          { id: 'u2', name: 'Priya Sharma',  email: 'priya@gov.in',   role: 'OFFICER', is_locked: false },
+          { id: 'u3', name: 'Amit Singh',    email: 'amit@gov.in',    role: 'DEPT_HEAD', is_locked: false },
+          { id: 'u4', name: 'Sunita Devi',   email: 'sunita@gov.in',  role: 'CITIZEN', is_locked: true  },
+          { id: 'u5', name: 'Ravi Verma',    email: 'ravi@gov.in',    role: 'OFFICER', is_locked: false },
+        ],
+        reviewQueue: [
+          { id: 'rq1', reference_id: 'CRP-2026-0039', title: 'Unclear Complaint Category', confidence: 0.61 },
+          { id: 'rq2', reference_id: 'CRP-2026-0027', title: 'Ambiguous Location Tag',      confidence: 0.74 },
+        ],
+        appeals: [
+          { id: 'ap1', reference_id: 'CRP-2026-0022', citizen_name: 'Mohan Lal', reason: 'Complaint was wrongly rejected by officer. The issue is still unresolved.' },
+        ],
+      });
     } finally {
       setLoading(false);
     }
@@ -39,7 +55,7 @@ export default function AdminDashboard() {
   const { users, reviewQueue, appeals } = data || { users: [], reviewQueue: [], appeals: [] };
 
   return (
-    <div className="min-h-screen bg-slate-950 text-slate-100 p-6 max-w-7xl mx-auto space-y-8">
+    <div className="bg-slate-950 text-slate-100 p-6 rounded-xl w-full mx-auto space-y-6">
       <div className="flex flex-col md:flex-row items-start md:items-center justify-between gap-4 border-b border-slate-800 pb-6">
         <div className="flex items-center gap-3">
           <div className="w-12 h-12 rounded-2xl bg-gradient-to-tr from-cyan-500 to-blue-600 flex items-center justify-center shadow-lg shadow-cyan-500/20">

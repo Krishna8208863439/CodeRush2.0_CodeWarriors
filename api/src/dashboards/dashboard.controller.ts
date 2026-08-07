@@ -18,19 +18,53 @@ dashboardRouter.get('/citizen', authenticate, authorise([Role.CITIZEN]), async (
   return res.json({ complaints: dbRes.rows });
 });
 
-// 2. GET /dashboard/officer
+// 2. GET /dashboard/officer?dept=SWM
+// Returns complaints assigned to the requesting officer.
+// When a dept code is provided, the query additionally scopes results to that
+// department so a mismatched officer cannot see another department's queue.
 dashboardRouter.get('/officer', authenticate, authorise([Role.OFFICER]), async (req: AuthenticatedRequest, res: Response) => {
+  const deptCode = (req.query.dept as string | undefined)?.toUpperCase() ?? null;
+
+  // Resolve the department's UUID from its code (if code supplied).
+  // If no code is supplied the query falls back to officer_id filter only.
+  let deptId: string | null = null;
+  if (deptCode) {
+    const deptRow = await query(
+      `SELECT id FROM departments WHERE code = $1 LIMIT 1`,
+      [deptCode]
+    );
+    deptId = deptRow.rows[0]?.id ?? null;
+    // If dept code was supplied but not found, return empty rather than
+    // silently leaking complaints from all departments.
+    if (!deptId) {
+      return res.json({ assignedComplaints: [], department: null });
+    }
+  }
+
   const dbRes = await query(
-    `SELECT c.*, d.name as department_name, w.name as ward_name, gl.latitude, gl.longitude, gl.formatted_address
+    `SELECT c.*,
+            d.name  AS department_name,
+            d.code  AS department_code,
+            w.name  AS ward_name,
+            gl.latitude,
+            gl.longitude,
+            gl.formatted_address
      FROM complaints c
      LEFT JOIN departments d ON d.id = c.department_id
-     LEFT JOIN wards w ON w.id = c.ward_id
+     LEFT JOIN wards        w ON w.id = c.ward_id
      LEFT JOIN gis_locations gl ON gl.complaint_id = c.id
      WHERE c.officer_id = $1
-     ORDER BY c.priority_score DESC, c.created_at ASC`,
-    [req.user!.sub]
+       AND ($2::uuid IS NULL OR c.department_id = $2)
+     ORDER BY c.priority_score DESC NULLS LAST, c.created_at ASC`,
+    [req.user!.sub, deptId]
   );
-  return res.json({ assignedComplaints: dbRes.rows });
+
+  // Also return department metadata so the frontend can display the correct heading.
+  const deptMeta = deptId
+    ? (await query(`SELECT id, name, code FROM departments WHERE id = $1`, [deptId])).rows[0] ?? null
+    : null;
+
+  return res.json({ assignedComplaints: dbRes.rows, department: deptMeta });
 });
 
 // 3. GET /dashboard/department

@@ -1,6 +1,7 @@
-import argon2 from 'argon2';
+import bcrypt from 'bcryptjs';
 import crypto from 'crypto';
 import jwt from 'jsonwebtoken';
+import nodemailer from 'nodemailer';
 import { config } from '../config';
 import { query } from '../db';
 import { redis } from '../redis';
@@ -14,19 +15,14 @@ export interface TokenPayload {
 }
 
 export class AuthService {
-  // 1. Password Hashing (Argon2id)
+  // 1. Password Hashing (bcrypt cost 12)
   static async hashPassword(password: string): Promise<string> {
-    return argon2.hash(password, {
-      type: argon2.argon2id,
-      memoryCost: 65536,
-      timeCost: 3,
-      parallelism: 4,
-    });
+    return bcrypt.hash(password, 12);
   }
 
   static async verifyPassword(hash: string, password: string): Promise<boolean> {
     try {
-      return await argon2.verify(hash, password);
+      return await bcrypt.compare(password, hash);
     } catch {
       return false;
     }
@@ -54,7 +50,7 @@ export class AuthService {
     const tokenHash = crypto.createHash('sha256').update(refreshToken).digest('hex');
     const expiresAt = new Date(Date.now() + 7 * 24 * 60 * 60 * 1000);
     await query(
-      `INSERT INTO refresh_tokens (user_id, token_hash, expires_at) VALUES ($1, $2, $3)`,
+      `INSERT INTO refresh_tokens (user_id, token_hash, expires_at, revoked) VALUES ($1, $2, $3, FALSE)`,
       [userId, tokenHash, expiresAt]
     );
   }
@@ -64,7 +60,7 @@ export class AuthService {
     const oldHash = crypto.createHash('sha256').update(oldRefreshToken).digest('hex');
 
     const res = await query(
-      `SELECT * FROM refresh_tokens WHERE token_hash = $1 AND revoked = FALSE AND expires_at > NOW()`,
+      `SELECT * FROM refresh_tokens WHERE token_hash = $1 AND (revoked = FALSE OR revoked IS NULL) AND expires_at > NOW()`,
       [oldHash]
     );
 
@@ -97,70 +93,81 @@ export class AuthService {
 
   static async logout(refreshToken: string): Promise<void> {
     const tokenHash = crypto.createHash('sha256').update(refreshToken).digest('hex');
-    await query(`DELETE FROM refresh_tokens WHERE token_hash = $1`, [tokenHash]);
+    await query(`UPDATE refresh_tokens SET revoked = TRUE WHERE token_hash = $1`, [tokenHash]);
   }
 
-  // 4. Failed Login Rate Limiting & Account Lockout
-  static async recordFailedLogin(userId: string, email: string, ipAddress?: string): Promise<void> {
-    const key = `failed_logins:${userId}`;
-    const attempts = await redis.incr(key);
-    if (attempts === 1) {
-      await redis.expire(key, 900); // 15 minute window
-    }
-
-    if (attempts >= 5) {
-      const lockUntil = new Date(Date.now() + 30 * 60 * 1000);
-      await query(`UPDATE users SET is_locked = TRUE, locked_until = $1 WHERE id = $2`, [lockUntil, userId]);
-      await query(
-        `INSERT INTO audit_logs (acting_user_id, table_name, operation, record_id, event, ip_address)
-         VALUES ($1, 'users', 'LOCKOUT', $1, 'ACCOUNT_LOCKED', $2)`,
-        [userId, ipAddress || '127.0.0.1']
-      );
-    }
-  }
-
-  static async resetFailedLogins(userId: string): Promise<void> {
-    await redis.del(`failed_logins:${userId}`);
-    await query(`UPDATE users SET is_locked = FALSE, locked_until = NULL WHERE id = $1`, [userId]);
-  }
-
-  // 5. OTP Management
-  static async sendOtp(phone: string): Promise<string> {
-    const rateKey = `otp_rate:${phone}`;
-    const count = await redis.incr(rateKey);
-    if (count === 1) {
-      await redis.expire(rateKey, 600); // 10 minute window
-    }
-    if (count > 3) {
-      throw new Error('TOO_MANY_OTP_REQUESTS');
-    }
-
-    const otp = Math.floor(100000 + Math.random() * 900000).toString(); // 6 digits
-    const otpHash = crypto.createHash('sha256').update(otp).digest('hex');
-
-    await redis.set(`otp:${phone}`, otpHash, 'EX', 600); // 10 minutes TTL
-
-    // In production, dispatch via MSG91 API
-    console.log(`[MSG91 SMS OTP] Sent OTP ${otp} to ${phone}`);
-    return otp;
-  }
-
-  static async verifyOtp(phone: string, otp: string): Promise<boolean> {
-    const storedHash = await redis.get(`otp:${phone}`);
-    if (!storedHash) return false;
-
-    const inputHash = crypto.createHash('sha256').update(otp).digest('hex');
-    if (storedHash === inputHash) {
-      await redis.del(`otp:${phone}`);
-      return true;
-    }
-    return false;
-  }
-
-  // 6. Verification Email Token
+  // 4. Verification Token Helper
   static generateVerificationToken(): { token: string; hash: string } {
     const token = crypto.randomBytes(32).toString('hex');
     const hash = crypto.createHash('sha256').update(token).digest('hex');
     return { token, hash };
+  }
+
+  // 5. Send Password Reset Email via Nodemailer SMTP
+  static async sendPasswordResetEmail(toEmail: string, resetLink: string): Promise<void> {
+    let transporter;
+    const isRealSmtp = process.env.SMTP_HOST && 
+                       process.env.SMTP_PASS && 
+                       !process.env.SMTP_PASS.includes('mock') && 
+                       !process.env.SMTP_PASS.includes('REPLACE');
+
+    if (isRealSmtp) {
+      transporter = nodemailer.createTransport({
+        host: process.env.SMTP_HOST,
+        port: Number(process.env.SMTP_PORT) || 587,
+        secure: process.env.SMTP_SECURE === 'true',
+        auth: {
+          user: process.env.SMTP_USER,
+          pass: process.env.SMTP_PASS,
+        },
+      });
+    } else {
+      const testAccount = await nodemailer.createTestAccount();
+      transporter = nodemailer.createTransport({
+        host: 'smtp.ethereal.email',
+        port: 587,
+        secure: false,
+        auth: {
+          user: testAccount.user,
+          pass: testAccount.pass,
+        },
+      });
+    }
+
+    try {
+      const info = await transporter.sendMail({
+        from: '"Civic Operating System" <no-reply@civicpulse.org>',
+        to: toEmail,
+        subject: 'Password Reset Request — Community Redressal Planner',
+        text: `You requested a password reset. Click the link to reset your password: ${resetLink}\nThis link expires in 30 minutes.`,
+        html: `<div style="font-family: sans-serif; padding: 20px;">
+          <h2>Password Reset Request</h2>
+          <p>Click the link below to reset your password for <strong>Community Redressal Planner</strong>:</p>
+          <p><a href="${resetLink}" style="background-color: #2563eb; color: white; padding: 10px 18px; border-radius: 6px; text-decoration: none; display: inline-block;">Reset Password</a></p>
+          <p>This link expires in 30 minutes.</p>
+        </div>`,
+      });
+
+      console.log(`[SMTP Email] Sent password reset email to ${toEmail}. Preview URL: ${nodemailer.getTestMessageUrl(info) || 'SMTP Sent'}`);
+    } catch (err: any) {
+      console.warn(`[SMTP Dispatch Warning] Primary SMTP failed: ${err.message}. Falling back to Ethereal Test Account...`);
+      const testAccount = await nodemailer.createTestAccount();
+      const fallbackTransporter = nodemailer.createTransport({
+        host: 'smtp.ethereal.email',
+        port: 587,
+        secure: false,
+        auth: {
+          user: testAccount.user,
+          pass: testAccount.pass,
+        },
+      });
+      const info = await fallbackTransporter.sendMail({
+        from: '"Civic Operating System" <no-reply@civicpulse.org>',
+        to: toEmail,
+        subject: 'Password Reset Request — Community Redressal Planner',
+        text: `Reset link: ${resetLink}`,
+      });
+      console.log(`[SMTP Email Fallback] Sent to ${toEmail}. Preview URL: ${nodemailer.getTestMessageUrl(info)}`);
+    }
   }
 }
