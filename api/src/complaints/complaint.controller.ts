@@ -296,3 +296,22 @@ complaintRouter.post('/:id/feedback', authenticate, authorise([Role.CITIZEN]), a
 
   return res.status(201).json({ message: 'Feedback submitted successfully', feedback: feedbackRes.rows[0] });
 });
+
+// 7. GET /complaints/open-data (Public Transparency API)
+complaintRouter.get('/open-data', async (req: Request, res: Response) => {
+  const dbRes = await query(
+    `SELECT c.reference_id, c.category, c.status, c.created_at, c.updated_at,
+            d.name as department_name, w.name as ward_name
+     FROM complaints c
+     LEFT JOIN departments d ON d.id = c.department_id
+     LEFT JOIN wards w ON w.id = c.ward_id
+     ORDER BY c.created_at DESC LIMIT 100`
+  );
+  return res.json({
+    license: 'Open Government Data License (OGDL)',
+    timestamp: new Date().toISOString(),
+    recordCount: dbRes.rows.length,
+    complaints: dbRes.rows,
+  });
+});
+
