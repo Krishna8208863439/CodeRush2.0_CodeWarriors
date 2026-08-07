@@ -7,7 +7,7 @@ import { ShieldCheck, FileText, Image as ImageIcon, Mic, Video, Volume2, MapPin,
 import { api } from '@/lib/api';
 
 export default function NewComplaintPage() {
-  const router = Router();
+  const router = useRouter();
   const [channel, setChannel] = useState<'text' | 'image' | 'voice' | 'audio' | 'video'>('text');
 
   // Form State

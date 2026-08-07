@@ -7,7 +7,7 @@ import { ShieldCheck, User, Mail, Phone, Lock, AlertCircle, ArrowRight, CheckSqu
 import { api } from '@/lib/api';
 
 export default function RegisterPage() {
-  const router = Router();
+  const router = useRouter();
   const [name, setName] = useState('');
   const [email, setEmail] = useState('');
   const [phone, setPhone] = useState('');

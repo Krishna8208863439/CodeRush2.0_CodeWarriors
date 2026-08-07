@@ -7,7 +7,7 @@ import { ShieldCheck, Mail, Lock, Phone, KeyRound, AlertCircle, ArrowRight } fro
 import { api } from '@/lib/api';
 
 export default function LoginPage() {
-  const router = Router();
+  const router = useRouter();
   const [tab, setTab] = useState<'password' | 'otp'>('password');
 
   // Password Login State

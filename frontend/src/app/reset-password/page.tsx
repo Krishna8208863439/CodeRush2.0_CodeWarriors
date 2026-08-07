@@ -7,7 +7,7 @@ import { ShieldCheck, Mail, Lock, KeyRound, AlertCircle, ArrowRight } from 'luci
 import { api } from '@/lib/api';
 
 export default function ResetPasswordPage() {
-  const router = Router();
+  const router = useRouter();
   const [step, setStep] = useState<'request' | 'reset'>('request');
 
   const [email, setEmail] = useState('');
