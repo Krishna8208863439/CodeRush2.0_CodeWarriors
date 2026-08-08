@@ -2,21 +2,15 @@
   "name": "community-redressal-planner",
   "version": "1.0.0",
   "private": true,
-  "description": "AI-powered civic operating system for municipal complaint management and resolution",
+  "description": "AI-Powered Civic Operating System for Government Governance",
   "workspaces": [
     "frontend",
-    "api"
+    "backend-core"
   ],
   "scripts": {
-    "dev:api": "npm run dev --workspace=api",
-    "dev:frontend": "npm run dev --workspace=frontend",
-    "build:api": "npm run build --workspace=api",
-    "build:frontend": "npm run build --workspace=frontend",
-    "migrate:up": "npm run migrate:up --workspace=api",
-    "migrate:down": "npm run migrate:down --workspace=api",
-    "lint": "npm run lint --workspace=api && npm run lint --workspace=frontend"
-  },
-  "devDependencies": {
-    "prettier": "^3.2.5"
+    "dev:backend": "npm --prefix backend-core start",
+    "dev:ai": "cd backend-ai && python -m uvicorn main:app --reload --port 8000",
+    "dev:frontend": "npm --prefix frontend dev",
+    "seed": "npm --prefix backend-core run seed"
   }
 }
